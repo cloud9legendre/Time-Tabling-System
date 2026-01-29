@@ -9,6 +9,8 @@ from src.database import get_db
 from src.models import Booking, Lab, Instructor, Module, Department
 from src.auth.dependencies import get_current_user, get_current_active_admin
 from src.export import generate_ics
+import calendar
+from sqlalchemy import extract
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")
@@ -18,20 +20,60 @@ def health_check():
     return {"status": "healthy"}
 
 @router.get("/", response_class=HTMLResponse)
-def admin_dashboard(request: Request, user: Instructor = Depends(get_current_active_admin), db: Session = Depends(get_db)):
-    # 1. Authorization (Role) handled by dependency
+def admin_dashboard(
+    request: Request, 
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    user: Instructor = Depends(get_current_active_admin), 
+    db: Session = Depends(get_db)
+):
+    # 1. Date Navigation Logic
+    today = date.today()
+    if not year: year = today.year
+    if not month: month = today.month
 
-    # 3. Fetch Data for Dashboard
-    bookings = db.query(Booking).order_by(Booking.booking_date, Booking.start_time).all()
+    # Normalize month
+    if month > 12:
+        month = 1
+        year += 1
+    elif month < 1:
+        month = 12
+        year -= 1
+
+    # Calculate Prev/Next for UI
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
     
-    # Fetch ALL resources for the Management Tabs
+    # 2. Calendar Matrix
+    # monthcalendar returns list of weeks, each week is list of days (0 for padding)
+    calendar_weeks = calendar.monthcalendar(year, month)
+    month_name = calendar.month_name[month]
+
+    # 3. Fetch Data for Dashboard (Calendar Scoped)
+    # Filter bookings for the selected month/year only
+    calendar_bookings = db.query(Booking).filter(
+        extract('month', Booking.booking_date) == month,
+        extract('year', Booking.booking_date) == year
+    ).order_by(Booking.booking_date, Booking.start_time).all()
+    
+    bookings_by_date = {}
+    for b in calendar_bookings:
+        d_str = b.booking_date.isoformat()
+        if d_str not in bookings_by_date:
+            bookings_by_date[d_str] = []
+        bookings_by_date[d_str].append(b)
+
+    # 4. Fetch Management Data (ALL) for other tabs
+    bookings_list = db.query(Booking).order_by(Booking.booking_date, Booking.start_time).all()
+    
     all_labs = db.query(Lab).order_by(Lab.id).all()
-    # Exclude SUPER_ADMIN from management list to prevent accidental editing/deletion
     all_instructors = db.query(Instructor).filter(Instructor.role != "SUPER_ADMIN").order_by(Instructor.name).all()
     all_modules = db.query(Module).order_by(Module.code).all()
     departments = db.query(Department).order_by(Department.code).all()
 
-    # Filter ACTIVE resources for the Booking Dropdowns
+    # Filter ACTIVE resources
     active_labs = [l for l in all_labs if l.is_active]
     # Allow Instructors AND Admins to be booked
     active_instructors = [i for i in all_instructors if i.is_active and i.role in ["INSTRUCTOR", "ADMIN"]]
@@ -40,7 +82,19 @@ def admin_dashboard(request: Request, user: Instructor = Depends(get_current_act
     return templates.TemplateResponse("admin_dashboard.html", {
         "request": request, 
         "user": user,
-        "bookings": bookings,
+        
+        # Calendar Data
+        "year": year,
+        "month": month,
+        "month_name": month_name,
+        "calendar_weeks": calendar_weeks,
+        "bookings_by_date": bookings_by_date,
+        "prev_year": prev_year, "prev_month": prev_month,
+        "next_year": next_year, "next_month": next_month,
+        "today_str": today.isoformat(),
+        
+        # Management Data
+        "bookings": bookings_list,
         "all_labs": all_labs, 
         "all_instructors": all_instructors, 
         "all_modules": all_modules,

@@ -360,6 +360,101 @@
             filter: grayscale(100%);
             border-color: #ccc;
         }
+
+        /* CALENDAR GRID STYLES */
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-nav h2 {
+            margin: 0;
+            color: #004d40;
+        }
+
+        .calendar-nav a {
+            text-decoration: none;
+            background: #eee;
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .calendar-nav a:hover {
+            background: #ddd;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar-header-cell {
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            padding: 10px;
+            background: #e0f2f1;
+            border-radius: 4px;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #004d40;
+            background-color: #fffde7;
+        }
+
+        .day-number {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .booking-badge {
+            display: block;
+            font-size: 0.75em;
+            padding: 4px;
+            margin-bottom: 4px;
+            border-radius: 3px;
+            background: #e0f7fa;
+            color: #006064;
+            text-decoration: none;
+            border-left: 3px solid #0097a7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .booking-badge:hover {
+            opacity: 0.8;
+        }
     </style>
     <script>
         function openTab(tabName) {
@@ -416,14 +511,64 @@
     {% if request.query_params.success %}<p class="success">{{ request.query_params.success }}</p>{% endif %}
 
     <div class="tab-container">
-        <div id="btn-bookings" class="tab active" onclick="openTab('bookings')">📅 Bookings</div>
+        <div id="btn-calendar" class="tab active" onclick="openTab('calendar')">🗓️ Master Schedule</div>
+        <div id="btn-bookings" class="tab" onclick="openTab('bookings')">📝 Manage Bookings</div>
         <div id="btn-labs" class="tab" onclick="openTab('labs')">🔬 Labs</div>
         <div id="btn-modules" class="tab" onclick="openTab('modules')">📚 Modules</div>
         <div id="btn-instructors" class="tab" onclick="openTab('instructors')">👨‍🏫 Instructors</div>
     </div>
 
+    <!-- CALENDAR TAB (Default) -->
+    <div id="calendar" class="tab-content active">
+        <div class="calendar-nav">
+            <a href="/?month={{prev_month}}&year={{prev_year}}">◀ Prev</a>
+            <h2>{{ month_name }} {{ year }}</h2>
+            <a href="/?month={{next_month}}&year={{next_year}}">Next ▶</a>
+        </div>
+
+        <div class="calendar-grid">
+            <!-- Headers -->
+            <div class="calendar-header-cell">Mon</div>
+            <div class="calendar-header-cell">Tue</div>
+            <div class="calendar-header-cell">Wed</div>
+            <div class="calendar-header-cell">Thu</div>
+            <div class="calendar-header-cell">Fri</div>
+            <div class="calendar-header-cell">Sat</div>
+            <div class="calendar-header-cell">Sun</div>
+
+            <!-- Days -->
+            {% for week in calendar_weeks %}
+            {% for day in week %}
+            {% if day == 0 %}
+            <div class="calendar-day empty"></div>
+            {% else %}
+            {% set date_str = year ~ '-' ~ ("%02d"|format(month)) ~ '-' ~ ("%02d"|format(day)) %}
+            <div class="calendar-day {{ 'today' if date_str == today_str else '' }}">
+                <div class="day-number">
+                    {{ day }}
+                    {% if date_str in bookings_by_date %}
+                    <span
+                        style="font-size:0.7em; background:#004d40; color:white; padding:2px 5px; border-radius:10px;">{{
+                        bookings_by_date[date_str]|length }}</span>
+                    {% endif %}
+                </div>
+
+                {% if date_str in bookings_by_date %}
+                {% for b in bookings_by_date[date_str] %}
+                <a href="/bookings/edit/{{b.id}}" class="booking-badge">
+                    {{ b.start_time.strftime('%H:%M') }} {{ b.module_code }}
+                </a>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- BOOKINGS TAB -->
-    <div id="bookings" class="tab-content active">
+    <div id="bookings" class="tab-content">
         <form action="/bookings/create" method="POST" class="create-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
