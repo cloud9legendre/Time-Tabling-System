@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Instructor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI';
+            padding: 20px;
+            background: #f4f4f9;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #004d40;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Edit Instructor</h2>
+        <form action="/instructors/update/{{instructor.id}}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <label>Name</label><input type="text" name="name" value="{{instructor.name}}" required>
+            <label>Email</label><input type="email" name="email" value="{{instructor.email}}" required>
+            <label>Dept</label>
+            <select name="dept">
+                {% for d in departments %}<option value="{{d.code}}" {% if d.code==instructor.department_code
+                    %}selected{% endif %}>{{d.code}}</option>{% endfor %}
+            </select>
+            <label>Role</label>
+            <select name="role">
+                <option value="INSTRUCTOR" {% if instructor.role=='INSTRUCTOR' %}selected{% endif %}>INSTRUCTOR</option>
+                <option value="ADMIN" {% if instructor.role=='ADMIN' %}selected{% endif %}>ADMIN</option>
+            </select>
+            <label>University</label><input type="text" name="university" value="{{instructor.university or ''}}">
+            <label>Degree</label><input type="text" name="degree" value="{{instructor.degree or ''}}">
+            <label>Graduated</label><input type="date" name="graduated_date" value="{{instructor.graduated_date}}">
+            <label>Photo URL</label><input type="text" name="photo_url" value="{{instructor.photo_url or ''}}">
+
+            <button type="submit">Update Instructor</button>
+            <a href="/"
+                style="display:block;text-align:center;margin-top:10px;text-decoration:none;color:#666;">Cancel</a>
+        </form>
+    </div>
+</body>
+
+</html>

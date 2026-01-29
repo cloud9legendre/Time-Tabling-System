@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+jinja2
+python-multipart
+python-dateutil
+reportlab
+ics
+passlib[bcrypt]
+bcrypt==3.2.2
+python-jose[cryptography]
+python-dotenv
+slowapi
+alembic
+requests

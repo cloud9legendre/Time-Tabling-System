@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: #f4f4f9;
+        }
+
+        /* Header & Logout */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+
+        .btn-logout {
+            background: #d32f2f;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Tabs */
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            background: #eee;
+        }
+
+        .tab.active {
+            color: #004d40;
+            border-bottom: 2px solid #004d40;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Modern Form Styling */
+        form.create-form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        /* Recurring Section Styling - Enhanced */
+        .recurring-section {
+            background: linear-gradient(135deg, #e0f2f1 0%, #ffffff 100%);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #b2dfdb;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+            min-height: 70px;
+            /* Prevent layout jump */
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-wrapper input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #004d40;
+            margin: 0;
+        }
+
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 700;
+            color: #004d40;
+            font-size: 1rem;
+        }
+
+        /* The hidden field container */
+        #recurring_end_div {
+            /* Styles when visible */
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #b2dfdb;
+            flex-grow: 1;
+            max-width: 250px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: slideFadeIn 0.3s ease-out;
+            display: none;
+            /* Hidden by default */
+        }
+
+        #recurring_end_div label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #00695c;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #recurring_end_div input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            border-left: 4px solid #004d40;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        @keyframes slideFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background: #004d40;
+            color: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button.btn-primary:hover {
+            background: #00695c;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #004d40;
+            color: white;
+        }
+
+        .error {
+            color: #d32f2f;
+            background: #ffcdd2;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            color: #388e3c;
+            background: #c8e6c9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .status-inactive {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .btn-toggle {
+            font-size: 11px;
+            padding: 2px 6px;
+            background: #eee;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
+
+        .btn-delete {
+            color: #d32f2f;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0;
+            text-decoration: underline;
+            font-size: 0.9em;
+        }
+
+        .action-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Instructor Tiles Styling */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .instructor-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .instructor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructor-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #004d40;
+            background-color: #f0f0f0;
+        }
+
+        .instructor-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .instructor-meta {
+            font-size: 0.85em;
+            color: #00695c;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .instructor-details {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+            justify-content: center;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .status-inactive.instructor-card {
+            opacity: 0.7;
+            background: #f9f9f9;
+        }
+
+        .status-inactive .instructor-img {
+            filter: grayscale(100%);
+            border-color: #ccc;
+        }
+    </style>
+    <script>
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.getElementById('btn-' + tabName).classList.add('active');
+        }
+
+        function filterModules() {
+            const semSelect = document.getElementById("semester_select");
+            const moduleSelect = document.getElementById("module_select");
+            const selectedSem = semSelect.value;
+            for (let i = 0; i < moduleSelect.options.length; i++) {
+                const opt = moduleSelect.options[i];
+                const modSem = opt.getAttribute("data-sem");
+                if (!modSem) continue;
+                if (selectedSem === "all" || modSem === selectedSem) { opt.style.display = "block"; opt.disabled = false; }
+                else { opt.style.display = "none"; opt.disabled = true; }
+            }
+            moduleSelect.value = "";
+        }
+
+        function toggleRecurring() {
+            const chk = document.getElementById("is_recurring");
+            const endDiv = document.getElementById("recurring_end_div");
+            const inp = document.getElementById("repeat_until");
+            if (chk.checked) {
+                endDiv.style.display = "block";
+                inp.required = true;
+            } else {
+                endDiv.style.display = "none";
+                inp.required = false;
+                inp.value = "";
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🏛️ Admin Dashboard</h1>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+
+    {% if request.query_params.error %}<p class="error">{{ request.query_params.error }}</p>{% endif %}
+    {% if request.query_params.success %}<p class="success">{{ request.query_params.success }}</p>{% endif %}
+
+    <div class="tab-container">
+        <div id="btn-bookings" class="tab active" onclick="openTab('bookings')">📅 Bookings</div>
+        <div id="btn-labs" class="tab" onclick="openTab('labs')">🔬 Labs</div>
+        <div id="btn-modules" class="tab" onclick="openTab('modules')">📚 Modules</div>
+        <div id="btn-instructors" class="tab" onclick="openTab('instructors')">👨‍🏫 Instructors</div>
+    </div>
+
+    <!-- BOOKINGS TAB -->
+    <div id="bookings" class="tab-content active">
+        <form action="/bookings/create" method="POST" class="create-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <!-- Row 1: Who & Where -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Lab Venue</label>
+                    <select name="lab_id" required>
+                        {% for l in active_labs %}<option value="{{l.id}}">{{l.name}}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Instructor</label>
+                    <select name="instructor_id" required>
+                        {% for i in active_instructors %}<option value="{{i.id}}">{{i.name}}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Semester Filter</label>
+                    <select id="semester_select" onchange="filterModules()">
+                        <option value="all">-- All --</option>
+                        <option value="1">Sem 1</option>
+                        <option value="2">Sem 2</option>
+                        <option value="3">Sem 3</option>
+                        <option value="4">Sem 4</option>
+                        <option value="5">Sem 5</option>
+                        <option value="6">Sem 6</option>
+                        <option value="7">Sem 7</option>
+                        <option value="8">Sem 8</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 2: What -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Module</label>
+                    <select name="module_code" id="module_select" required>
+                        <option value="" disabled selected>-- Select --</option>
+                        {% for m in active_modules %}
+                        <option value="{{m.code}}" data-sem="{{m.semester}}">[{{m.semester}}] {{m.code}} - {{m.title}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label>Practical Name / Description</label>
+                    <input type="text" name="practical_name" placeholder="e.g. Lab 01: Introduction" required>
+                </div>
+            </div>
+
+            <!-- Row 3: When -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" name="booking_date" required>
+                </div>
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" name="start_time" required>
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" name="end_time" required>
+                </div>
+            </div>
+
+            <!-- Row 4: Recurring (Separate Box) -->
+            <div class="recurring-section">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="is_recurring" name="is_recurring" onchange="toggleRecurring()">
+                    <label for="is_recurring">Repeat Weekly</label>
+                </div>
+                <div id="recurring_end_div">
+                    <label>Repeat Until Date</label>
+                    <input type="date" name="repeat_until" id="repeat_until">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Confirm Booking</button>
+        </form>
+
+        <h3>Current Schedule</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Lab</th>
+                    <th>Mod</th>
+                    <th>Instructor</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>{{b.booking_date}}</td>
+                    <td>{{b.start_time}} - {{b.end_time}}</td>
+                    <td>{{b.lab.name}}</td>
+                    <td>{{b.module_code}}</td>
+                    <td>{{b.instructor.name}}</td>
+                    <td class="action-cell">
+                        <a href="/bookings/edit/{{b.id}}" class="btn-edit">Edit</a>
+                        <form action="/bookings/delete/{{b.id}}" method="POST" style="display:inline;"
+                            onsubmit="return confirm('Delete?');"><input type="hidden" name="csrf_token"
+                                value="{{ csrf_token }}"><button class="btn-delete">Del</button></form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- LABS TAB -->
+    <div id="labs" class="tab-content">
+        <form action="/labs/create" method="POST" class="create-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="form-row">
+                <div class="form-group"><label>Name</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>Dept</label><select name="dept">{% for d in departments %}<option
+                            value="{{d.code}}">{{d.code}}</option>{% endfor %}</select></div>
+                <div class="form-group"><label>Capacity</label><input type="number" name="capacity" required></div>
+            </div>
+            <button type="submit" class="btn-primary">Add Lab</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Dept</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in all_labs %}
+                <tr class="{{ 'status-inactive' if not l.is_active else '' }}">
+                    <td>{{l.id}}</td>
+                    <td>{{l.name}}</td>
+                    <td>{{l.department_code}}</td>
+                    <td>{{ 'Active' if l.is_active else 'Inactive' }}</td>
+                    <td class="action-cell">
+                        <form action="/labs/toggle/{{l.id}}" method="POST" style="display:inline;"><input type="hidden"
+                                name="csrf_token" value="{{ csrf_token }}"><button class="btn-toggle">{{ 'Disable' if
+                                l.is_active else 'Enable' }}</button></form>
+                        <a href="/labs/edit/{{l.id}}" class="btn-edit">Edit</a>
+                        <form action="/labs/delete/{{l.id}}" method="POST" style="display:inline;"
+                            onsubmit="return confirm('Delete?');"><input type="hidden" name="csrf_token"
+                                value="{{ csrf_token }}"><button class="btn-delete">Del</button></form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MODULES TAB -->
+    <div id="modules" class="tab-content">
+        <form action="/modules/create" method="POST" class="create-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="form-row">
+                <div class="form-group"><label>Code</label><input type="text" name="code" required></div>
+                <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+                <div class="form-group"><label>Dept</label><select name="dept">{% for d in departments %}<option
+                            value="{{d.code}}">{{d.code}}</option>{% endfor %}</select></div>
+                <div class="form-group"><label>Semester</label><input type="number" name="semester" min="1" max="8"
+                        required></div>
+            </div>
+            <button type="submit" class="btn-primary">Add Module</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Sem</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in all_modules %}
+                <tr class="{{ 'status-inactive' if not m.is_active else '' }}">
+                    <td>{{m.code}}</td>
+                    <td>{{m.title}}</td>
+                    <td>{{m.semester}}</td>
+                    <td>{{ 'Active' if m.is_active else 'Inactive' }}</td>
+                    <td class="action-cell">
+                        <form action="/modules/toggle/{{m.code}}" method="POST" style="display:inline;"><input
+                                type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn-toggle">{{
+                                'Disable' if m.is_active else 'Enable' }}</button></form>
+                        <a href="/modules/edit/{{m.code}}" class="btn-edit">Edit</a>
+                        <form action="/modules/delete/{{m.code}}" method="POST" style="display:inline;"
+                            onsubmit="return confirm('Delete?');"><input type="hidden" name="csrf_token"
+                                value="{{ csrf_token }}"><button class="btn-delete">Del</button></form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- INSTRUCTORS TAB -->
+    <div id="instructors" class="tab-content">
+        <form action="/instructors/create" method="POST" class="create-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="form-row">
+                <div class="form-group"><label>Name</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
+                <div class="form-group"><label>Dept</label><select name="dept">{% for d in departments %}<option
+                            value="{{d.code}}">{{d.code}}</option>{% endfor %}</select></div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role">
+                        <option value="INSTRUCTOR" selected>INSTRUCTOR</option>
+                        <option value="ADMIN">ADMIN</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>University</label><input type="text" name="university"></div>
+                <div class="form-group"><label>Degree</label><input type="text" name="degree"></div>
+                <div class="form-group"><label>Graduated</label><input type="date" name="graduated_date"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Photo URL</label><input type="text" name="photo_url"></div>
+            </div>
+            <button type="submit" class="btn-primary">Add Instructor</button>
+        </form>
+
+        <div class="grid-container">
+            {% for i in all_instructors %}
+            <div class="instructor-card {{ 'status-inactive' if not i.is_active else '' }}">
+                <img src="{{ i.photo_url if i.photo_url else 'https://ui-avatars.com/api/?name=' + i.name + '&background=004d40&color=fff' }}"
+                    class="instructor-img" alt="{{ i.name }}">
+                <div class="instructor-name">{{ i.name }}</div>
+                <div class="instructor-meta">{{ i.department_code }} | {{ i.role }}</div>
+                <div class="instructor-details">
+                    {{ i.email }}<br>
+                    {% if i.university %}{{ i.university }}{% endif %}
+                    {% if i.degree %}<br>{{ i.degree }}{% endif %}
+                </div>
+                <div class="card-actions">
+                    <form action="/instructors/toggle/{{i.id}}" method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="btn-toggle">{{ 'Disable' if i.is_active else 'Enable' }}</button>
+                    </form>
+                    <a href="/instructors/edit/{{i.id}}" class="btn-edit">Edit</a>
+                    <form action="/instructors/delete/{{i.id}}" method="POST" style="display:inline;"
+                        onsubmit="return confirm('Delete?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="btn-delete">Del</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+
+</html>

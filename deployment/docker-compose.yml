@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: securepassword123
+      POSTGRES_DB: lab_timetabling_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d lab_timetabling_db" ]
+      interval: 10s
+      retries: 5
+
+  web:
+    build: ../backend
+    depends_on:
+      db:
+        condition: service_healthy
+    # Internal usage only, no ports exposed to host directly unless for debug
+    expose:
+      - "8000"
+    environment:
+      # DATABASE_URL is now read from .env if present, but we can override or pass through
+      DATABASE_URL: postgresql://admin:securepassword123@db:5432/lab_timetabling_db
+    env_file:
+      - ../backend/.env
+    volumes:
+      - ../backend:/app
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:

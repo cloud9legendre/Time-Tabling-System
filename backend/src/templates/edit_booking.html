@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Booking</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: #f4f4f9;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #004d40;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-save {
+            background: #004d40;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #777;
+            text-decoration: none;
+        }
+    </style>
+    <script>
+        function filterModules() {
+            const semSelect = document.getElementById("semester_select");
+            const moduleSelect = document.getElementById("module_select");
+            const selectedSem = semSelect.value;
+
+            for (let i = 0; i < moduleSelect.options.length; i++) {
+                const option = moduleSelect.options[i];
+                const modSem = option.getAttribute("data-sem");
+
+                // Skip options without semester data
+                if (!modSem) continue;
+
+                if (selectedSem === "all" || modSem === selectedSem) {
+                    option.style.display = "block";
+                    option.disabled = false;
+                } else {
+                    option.style.display = "none";
+                    option.disabled = true;
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>✏️ Edit Booking</h2>
+        <form action="/bookings/update/{{booking.id}}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <label>Lab</label>
+            <select name="lab_id">
+                {% for l in labs %}
+                <option value="{{l.id}}" {% if l.id==booking.lab_id %}selected{% endif %}>{{l.name}}</option>
+                {% endfor %}
+            </select>
+
+            <label>Instructor</label>
+            <select name="instructor_id">
+                {% for i in instructors %}
+                <option value="{{i.id}}" {% if i.id==booking.booked_by_id %}selected{% endif %}>{{i.name}}</option>
+                {% endfor %}
+            </select>
+
+            <label>Semester Filter</label>
+            <select id="semester_select" onchange="filterModules()">
+                <option value="all">-- All Semesters --</option>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+            </select>
+
+            <label>Module</label>
+            <select name="module_code" id="module_select">
+                {% for m in modules %}
+                <option value="{{m.code}}" data-sem="{{m.semester}}" {% if m.code==booking.module_code %}selected{%
+                    endif %}>
+                    [Sem {{m.semester}}] {{m.code}} - {{m.title}}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label>Practical Name</label>
+            <input type="text" name="practical_name"
+                value="{{ booking.practical_name if booking.practical_name else '' }}">
+
+            <label>Date</label>
+            <input type="date" name="booking_date" value="{{ booking.booking_date }}">
+
+            <label>Start Time</label>
+            <input type="time" name="start_time" value="{{ booking.start_time }}">
+
+            <label>End Time</label>
+            <input type="time" name="end_time" value="{{ booking.end_time }}">
+
+            <button type="submit" class="btn-save">Save Changes</button>
+            <a href="/" class="btn-cancel">Cancel</a>
+        </form>
+    </div>
+
+</body>
+
+</html>
