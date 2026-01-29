@@ -9,7 +9,7 @@ from slowapi import _rate_limit_exceeded_handler
 from ..database import engine, Base
 from ..auth.csrf import generate_csrf_token, CSRF_COOKIE_NAME
 from ..core.limiter import limiter
-from .routers import auth, dashboard, resources, bookings
+from .routers import auth, dashboard, resources, bookings, leaves
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
@@ -66,3 +66,4 @@ app.include_router(auth.router)
 app.include_router(dashboard.router)
 app.include_router(resources.router)
 app.include_router(bookings.router)
+app.include_router(leaves.router)

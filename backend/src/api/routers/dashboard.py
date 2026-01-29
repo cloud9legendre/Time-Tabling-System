@@ -6,7 +6,7 @@ from datetime import date
 from typing import Optional
 
 from src.database import get_db
-from src.models import Booking, Lab, Instructor, Module, Department
+from src.models import Booking, Lab, Instructor, Module, Department, Leave
 from src.auth.dependencies import get_current_user, get_current_active_admin
 from src.export import generate_ics
 import calendar
@@ -58,12 +58,44 @@ def admin_dashboard(
         extract('year', Booking.booking_date) == year
     ).order_by(Booking.booking_date, Booking.start_time).all()
     
+    # 2b. Fetch Approved Leaves for Conflict Checking
+    month_start = date(year, month, 1)
+    month_end = date(year, month, calendar.monthrange(year, month)[1])
+    
+    approved_leaves = db.query(Leave).filter(
+        Leave.status == "APPROVED",
+        Leave.end_date >= month_start,
+        Leave.start_date <= month_end
+    ).all()
+    
+    # Map instructor_id -> list of (start, end)
+    leave_map = {}
+    for l in approved_leaves:
+        if l.instructor_id not in leave_map: leave_map[l.instructor_id] = []
+        leave_map[l.instructor_id].append((l.start_date, l.end_date))
+
+    unavailable_instructors = set()
+
     bookings_by_date = {}
     for b in calendar_bookings:
+        # Check conflict
+        is_conflict = False
+        if b.instructor_id in leave_map:
+            for start, end in leave_map[b.instructor_id]:
+                if start <= b.booking_date <= end:
+                    is_conflict = True
+                    unavailable_instructors.add(b.instructor_id)
+                    break
+        b.is_conflict = is_conflict # Dynamically add attribute to instance
+
         d_str = b.booking_date.isoformat()
         if d_str not in bookings_by_date:
             bookings_by_date[d_str] = []
         bookings_by_date[d_str].append(b)
+    
+    # 2c. Fetch Pending Leaves for Management Tab
+    pending_leaves = db.query(Leave).filter(Leave.status == "PENDING").all()
+    pending_count = len(pending_leaves)
 
     # 4. Fetch Management Data (ALL) for other tabs
     bookings_list = db.query(Booking).order_by(Booking.booking_date, Booking.start_time).all()
@@ -102,7 +134,12 @@ def admin_dashboard(
         "active_labs": active_labs, 
         "active_instructors": active_instructors, 
         "active_modules": active_modules,
-        "csrf_token": request.state.csrf_token
+        "csrf_token": request.state.csrf_token,
+        
+        # Leave Management
+        "pending_leaves": pending_leaves,
+        "pending_count": pending_count,
+        "unavailable_instructors_count": len(unavailable_instructors)
     })
 
 @router.get("/instructor", response_class=HTMLResponse)
@@ -115,9 +152,11 @@ def instructor_dash(request: Request, user: Optional[Instructor] = Depends(get_c
         Booking.booking_date.asc(), 
         Booking.start_time.asc()
     ).all()
+
+    my_leaves = db.query(Leave).filter(Leave.instructor_id == user.id).order_by(Leave.start_date.desc()).all()
     
     return templates.TemplateResponse("instructor_dashboard.html", {
-        "request": request, "user": user, "schedule": schedule, "today": date.today(),
+        "request": request, "user": user, "schedule": schedule, "my_leaves": my_leaves, "today": date.today(),
         "csrf_token": request.state.csrf_token
     })
 
