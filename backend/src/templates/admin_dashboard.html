@@ -455,6 +455,62 @@
         .booking-badge:hover {
             opacity: 0.8;
         }
+
+        /* TOOLTIP STYLES */
+        .booking-item {
+            position: relative;
+            /* Anchor */
+        }
+
+        .booking-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 120%;
+            /* Above the badge */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #263238;
+            /* Dark Blue-Grey */
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            width: 220px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 0.85em;
+            text-align: left;
+            pointer-events: none;
+            /* Let clicks pass through */
+        }
+
+        .booking-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            /* Bottom of tooltip */
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #263238 transparent transparent transparent;
+        }
+
+        .booking-item:hover .booking-tooltip {
+            display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
     </style>
     <script>
         function openTab(tabName) {
@@ -555,9 +611,22 @@
 
                 {% if date_str in bookings_by_date %}
                 {% for b in bookings_by_date[date_str] %}
-                <a href="/bookings/edit/{{b.id}}" class="booking-badge">
-                    {{ b.start_time.strftime('%H:%M') }} {{ b.module_code }}
-                </a>
+                <div class="booking-item">
+                    <a href="/bookings/edit/{{b.id}}" class="booking-badge">
+                        {{ b.start_time.strftime('%H:%M') }} {{ b.module_code }}
+                    </a>
+                    <!-- Tooltip -->
+                    <div class="booking-tooltip">
+                        <div style="font-weight:bold; color:#80cbc4; margin-bottom:4px;">{{ b.module_code }}</div>
+                        <div>📅 {{ b.start_time.strftime('%H:%M') }} - {{ b.end_time.strftime('%H:%M') }}</div>
+                        <div>👨‍🏫 {{ b.instructor.name }}</div>
+                        <div style="margin-top:4px; font-style:italic; font-size:0.9em; color:#ddd;">{{ b.purpose }}
+                        </div>
+                        {% if b.lab %}
+                        <div style="margin-top:2px;">📍 {{ b.lab.name }}</div>
+                        {% endif %}
+                    </div>
+                </div>
                 {% endfor %}
                 {% endif %}
             </div>

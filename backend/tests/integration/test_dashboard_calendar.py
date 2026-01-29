@@ -89,5 +89,8 @@ def test_admin_dashboard_calendar_navigation(setup_db):
     response = client.get(f"/?month={next_month}&year={next_year}", cookies=cookies)
     assert response.status_code == 200
     
-    # Verify booking info is rendered (simple check for module code)
+    # Verify booking info is rendered
     assert "CS101" in response.text
+    # Verify tooltip structure exists
+    assert "booking-tooltip" in response.text
+
