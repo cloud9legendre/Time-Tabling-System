@@ -1,0 +1,130 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0
+rootdir: /app
+plugins: anyio-4.12.1
+collected 5 items
+
+tests/integration/test_password_mgmt.py FFFFF                            [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_instructor_change_password ________________________
+
+setup_db = <sqlalchemy.orm.session.Session object at 0x792dc4ab7eb0>
+
+    def test_instructor_change_password(setup_db):
+        # Login as Instructor
+        cookies = get_token_cookies(1, "INSTRUCTOR")
+    
+        # 1. Change Password Success
+        response = client.post(
+            "/auth/change-password",
+            data={
+                "old_password": "oldpass",
+                "new_password": "newpass",
+                "confirm_password": "newpass"
+            },
+            cookies=cookies,
+            follow_redirects=False # Expect redirect
+        )
+>       assert response.status_code == 303
+E       assert 404 == 303
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/integration/test_password_mgmt.py:72: AssertionError
+_____________________ test_admin_reset_instructor_password _____________________
+
+setup_db = <sqlalchemy.orm.session.Session object at 0x792dc4ab7eb0>
+
+    def test_admin_reset_instructor_password(setup_db):
+        # Login as Admin (ID 2)
+        cookies = get_token_cookies(2, "ADMIN")
+    
+        # Reset Instructor (ID 1)
+        response = client.post(f"/auth/reset-password/1", cookies=cookies, follow_redirects=False)
+>       assert response.status_code == 303
+E       assert 404 == 303
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/integration/test_password_mgmt.py:100: AssertionError
+____________________ test_admin_cannot_reset_admin_password ____________________
+
+setup_db = <sqlalchemy.orm.session.Session object at 0x792dc4ab7eb0>
+
+    def test_admin_cannot_reset_admin_password(setup_db):
+        # Login as Admin (ID 2)
+        cookies = get_token_cookies(2, "ADMIN")
+    
+        # Try Reset Other Admin (ID 4)
+        response = client.post(f"/auth/reset-password/4", cookies=cookies, follow_redirects=False)
+>       assert response.status_code == 303
+E       assert 404 == 303
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/integration/test_password_mgmt.py:114: AssertionError
+________________________ test_superadmin_can_reset_all _________________________
+
+setup_db = <sqlalchemy.orm.session.Session object at 0x792dc4ab7eb0>
+
+    def test_superadmin_can_reset_all(setup_db):
+        # Login as SuperAdmin (ID 3)
+        cookies = get_token_cookies(3, "SUPER_ADMIN")
+    
+        # Reset Admin (ID 4)
+        response = client.post(f"/auth/reset-password/4", cookies=cookies, follow_redirects=False)
+>       assert response.status_code == 303
+E       assert 404 == 303
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/integration/test_password_mgmt.py:123: AssertionError
+__________________________ test_admin_change_password __________________________
+
+setup_db = <sqlalchemy.orm.session.Session object at 0x792dc4ab7eb0>
+
+    def test_admin_change_password(setup_db):
+        # Login as Admin (ID 2)
+        cookies = get_token_cookies(2, "ADMIN")
+    
+        # 1. Change Password Success
+        response = client.post(
+            "/auth/change-password",
+            data={
+                "old_password": "adminpass",
+                "new_password": "newadminpass",
+                "confirm_password": "newadminpass"
+            },
+            cookies=cookies,
+            follow_redirects=False
+        )
+>       assert response.status_code == 303
+E       assert 404 == 303
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/integration/test_password_mgmt.py:145: AssertionError
+=============================== warnings summary ===============================
+src/database.py:16
+  /app/src/database.py:16: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/integration/test_password_mgmt.py::test_instructor_change_password
+tests/integration/test_password_mgmt.py::test_instructor_change_password
+tests/integration/test_password_mgmt.py::test_instructor_change_password
+tests/integration/test_password_mgmt.py::test_instructor_change_password
+  /app/tests/integration/test_password_mgmt.py:46: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    if not db.query(Instructor).get(u.id):
+
+tests/integration/test_password_mgmt.py::test_instructor_change_password
+tests/integration/test_password_mgmt.py::test_admin_reset_instructor_password
+tests/integration/test_password_mgmt.py::test_admin_cannot_reset_admin_password
+tests/integration/test_password_mgmt.py::test_superadmin_can_reset_all
+tests/integration/test_password_mgmt.py::test_admin_change_password
+  /usr/local/lib/python3.10/site-packages/starlette/testclient.py:445: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_password_mgmt.py::test_instructor_change_password
+FAILED tests/integration/test_password_mgmt.py::test_admin_reset_instructor_password
+FAILED tests/integration/test_password_mgmt.py::test_admin_cannot_reset_admin_password
+FAILED tests/integration/test_password_mgmt.py::test_superadmin_can_reset_all
+FAILED tests/integration/test_password_mgmt.py::test_admin_change_password - ...
+======================== 5 failed, 10 warnings in 9.04s ========================
