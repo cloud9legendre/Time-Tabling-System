@@ -617,7 +617,9 @@
                     </a>
                     <!-- Tooltip -->
                     <div class="booking-tooltip">
-                        <div style="font-weight:bold; color:#80cbc4; margin-bottom:4px;">{{ b.module_code }}</div>
+                        <div style="font-weight:bold; color:#80cbc4; margin-bottom:4px;">{{ b.module_code }} <span
+                                style="font-weight:normal; color:#b2dfdb; font-size:0.9em;">- {{ b.practical_name
+                                }}</span></div>
                         <div>📅 {{ b.start_time.strftime('%H:%M') }} - {{ b.end_time.strftime('%H:%M') }}</div>
                         <div>👨‍🏫 {{ b.instructor.name }}</div>
                         <div style="margin-top:4px; font-style:italic; font-size:0.9em; color:#ddd;">{{ b.purpose }}

@@ -59,7 +59,8 @@ def setup_db():
         start_time=time(10, 0),
         end_time=time(12, 0),
         status="CONFIRMED",
-        purpose="CLASS"
+        purpose="CLASS",
+        practical_name="Lab 01: Intro"
     )
     db.add(booking)
     db.commit()
@@ -93,4 +94,6 @@ def test_admin_dashboard_calendar_navigation(setup_db):
     assert "CS101" in response.text
     # Verify tooltip structure exists
     assert "booking-tooltip" in response.text
+    # Verify practical name is rendered
+    assert "Lab 01: Intro" in response.text
 
