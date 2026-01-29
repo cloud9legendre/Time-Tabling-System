@@ -18,8 +18,17 @@ logger = logging.getLogger(__name__)
 # Create Tables (will be redundant with Alembic later, but kept for now)
 Base.metadata.create_all(bind=engine)
 
+from fastapi.staticfiles import StaticFiles
+import os
+
 app = FastAPI(title="CLTS")
 app.state.limiter = limiter
+
+# Mount Static Files
+static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if not os.path.exists(static_dir):
+    os.makedirs(static_dir)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Middleware & Exception Handlers
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)

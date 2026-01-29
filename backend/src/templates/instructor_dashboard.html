@@ -5,314 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Schedule - UoM</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-
-        /* Header */
-        .header {
-            background: #004d40;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .logout {
-            color: white;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 6px 12px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .logout:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: white;
-        }
-
-        .container {
-            padding: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        /* Success Message */
-        .success-msg {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #c8e6c9;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        /* Profile Card */
-        .profile-card {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #e0f2f1;
-        }
-
-        .profile-info h2 {
-            margin: 0 0 5px 0;
-            font-size: 1.6rem;
-            color: #004d40;
-        }
-
-        .profile-info .dept-role {
-            color: #555;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .profile-info .details {
-            color: #777;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        .actions-bar {
-            margin-left: auto;
-            align-self: center;
-        }
-
-        .btn-export {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #004d40;
-            color: white;
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-
-        .btn-export:hover {
-            background-color: #00695c;
-        }
-
-        /* Schedule List */
-        .schedule-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
-
-        .schedule-header h3 {
-            margin: 0;
-            color: #444;
-        }
-
-        .session-card {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            display: flex;
-            border-left: 5px solid #ccc;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        .session-card:hover {
-            transform: translateX(5px);
-        }
-
-        /* ADDED: Past Session Styling */
-        .session-card.past-session {
-            opacity: 0.6;
-            filter: grayscale(1);
-            border-left-color: #ccc !important;
-            background-color: #fafafa;
-        }
-
-        /* Status Colors */
-        .session-card.status-class {
-            border-left-color: #004d40;
-        }
-
-        /* Teal */
-        .session-card.status-exam {
-            border-left-color: #c62828;
-        }
-
-        /* Red */
-        .session-card.status-adhoc {
-            border-left-color: #f9a825;
-        }
-
-        /* Yellow */
-
-        .date-box {
-            background: #f9f9f9;
-            padding: 15px;
-            min-width: 70px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-right: 1px solid #eee;
-        }
-
-        .date-box .month {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #666;
-            font-weight: bold;
-        }
-
-        .date-box .day {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .date-box .weekday {
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        .details-box {
-            padding: 15px 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .details-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .module-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #333;
-        }
-
-        .time-badge {
-            background: #eee;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #444;
-            white-space: nowrap;
-        }
-
-        .details-bottom {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .practical-name {
-            color: #00695c;
-            font-weight: 500;
-        }
-
-        .lab-location {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 4px;
-            font-size: 0.9rem;
-        }
-
-        .tag {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 3px;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        .tag-class {
-            background: #e0f2f1;
-            color: #00695c;
-        }
-
-        .tag-exam {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            background: white;
-            border-radius: 8px;
-            color: #888;
-            border: 2px dashed #ddd;
-        }
-
-        .empty-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            display: block;
-            opacity: 0.5;
-        }
-
-        @media (max-width: 700px) {
-            .profile-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .actions-bar {
-                margin-left: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/instructor_dashboard.css">
 </head>
 
 <body>
@@ -331,7 +24,13 @@
         <div class="success-msg">✅ {{ request.query_params.success }}</div>
         {% endif %}
 
-        <!-- NEW PROFILE CARD -->
+        {% if request.query_params.error %}
+        <div class="success-msg" style="color: #c62828; background: #ffebee; border-color: #ffcdd2;">
+            ❌ {{ request.query_params.error }}
+        </div>
+        {% endif %}
+
+        <!-- PROFILE CARD -->
         <div class="profile-card">
             <img src="{{ user.photo_url if user.photo_url else 'https://ui-avatars.com/api/?name=' + user.name + '&background=004d40&color=fff' }}"
                 class="profile-img" alt="Profile">
@@ -345,82 +44,62 @@
                 </div>
             </div>
             <div class="actions-bar">
-                <button onclick="document.getElementById('pwd-modal').style.display='block'" class="btn-export"
-                    style="border:none; cursor:pointer; margin-right: 10px; background-color: #0277bd;">
+                <button onclick="openModal('pwd-modal')" class="btn-export btn-pwd">
                     🔒 Change Password
                 </button>
-                <button onclick="document.getElementById('leave-modal').style.display='block'" class="btn-export"
-                    style="border:none; cursor:pointer; margin-right: 10px; background-color: #ef6c00;">
+                <button onclick="openModal('leave-modal')" class="btn-export btn-leave">
                     🏖️ Request Leave
                 </button>
                 <a href="/export/ics" class="btn-export">
-                    📅 Sync Calendar
+                    📅 Sync 🗓️ Master Schedule
                 </a>
             </div>
         </div>
 
         <!-- Leave Request Modal -->
-        <div id="leave-modal"
-            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-            <div
-                style="background:white; margin:10% auto; padding:20px; width:400px; border-radius:8px; position:relative;">
+        <div id="leave-modal" class="modal-overlay">
+            <div class="modal-content large">
                 <h3 style="margin-top:0;">Request Leave</h3>
-                <span onclick="document.getElementById('leave-modal').style.display='none'"
-                    style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">✕</span>
-
+                <span onclick="closeModal('leave-modal')" class="modal-close">✕</span>
                 <form action="/leaves/request" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Start Date</label>
-                        <input type="date" name="start_date" required
-                            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" name="start_date" required class="form-control">
                     </div>
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">End Date</label>
-                        <input type="date" name="end_date" required
-                            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" name="end_date" required class="form-control">
                     </div>
-                    <div style="margin-bottom:15px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Reason</label>
-                        <textarea name="reason" rows="3"
-                            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
+                    <div class="form-group">
+                        <label>Reason</label>
+                        <textarea name="reason" rows="3" class="form-control"></textarea>
                     </div>
-                    <button type="submit"
-                        style="background:#ef6c00; color:white; padding:10px; border:none; width:100%; border-radius:4px; cursor:pointer; font-weight:bold;">Submit
-                        Request</button>
+                    <button type="submit" class="btn-export btn-leave" style="width:100%;">Submit Request</button>
                 </form>
             </div>
         </div>
 
         <!-- Password Change Modal -->
-        <div id="pwd-modal"
-            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-            <div
-                style="background:white; margin:10% auto; padding:20px; width:300px; border-radius:8px; position:relative;">
+        <div id="pwd-modal" class="modal-overlay">
+            <div class="modal-content">
                 <h3 style="margin-top:0;">Change Password</h3>
-                <span onclick="document.getElementById('pwd-modal').style.display='none'"
-                    style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">✕</span>
-
+                <span onclick="closeModal('pwd-modal')" class="modal-close">✕</span>
                 <form action="/auth/change-password" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Current Password</label>
-                        <input type="password" name="old_password" required
-                            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" name="old_password" required class="form-control">
                     </div>
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">New Password</label>
-                        <input type="password" name="new_password" required
-                            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="new_password" required class="form-control">
                     </div>
-                    <div style="margin-bottom:15px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Confirm Password</label>
-                        <input type="password" name="confirm_password" required
-                            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirm_password" required class="form-control">
                     </div>
-                    <button type="submit"
-                        style="background:#004d40; color:white; padding:10px; border:none; width:100%; border-radius:4px; cursor:pointer; font-weight:bold;">Update
-                        Password</button>
+                    <button type="submit" class="btn-export" style="width:100%;">Update Password</button>
                 </form>
             </div>
         </div>
@@ -472,22 +151,20 @@
             <h3>My Leave Requests</h3>
         </div>
         {% if my_leaves %}
-        <div style="background:white; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05); padding:15px;">
-            <table style="width:100%; border-collapse:collapse;">
-                <tr style="border-bottom:1px solid #eee; text-align:left; color:#666; font-size:0.9em;">
-                    <th style="padding:10px;">Period</th>
-                    <th style="padding:10px;">Reason</th>
-                    <th style="padding:10px;">Status</th>
+        <div class="leaves-container">
+            <table>
+                <tr>
+                    <th>Period</th>
+                    <th>Reason</th>
+                    <th>Status</th>
                 </tr>
                 {% for leave in my_leaves %}
-                <tr style="border-bottom:1px solid #f5f5f5;">
-                    <td style="padding:10px;">{{ leave.start_date }} to {{ leave.end_date }}</td>
-                    <td style="padding:10px;">{{ leave.reason if leave.reason else '-' }}</td>
-                    <td style="padding:10px;">
+                <tr>
+                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                    <td>{{ leave.reason if leave.reason else '-' }}</td>
+                    <td>
                         <span
-                            style="padding:4px 8px; border-radius:4px; font-size:0.85em; font-weight:bold;
-                        background-color: {% if leave.status == 'APPROVED' %}#c8e6c9{% elif leave.status == 'REJECTED' %}#ffcdd2{% else %}#fff9c4{% endif %};
-                        color: {% if leave.status == 'APPROVED' %}#2e7d32{% elif leave.status == 'REJECTED' %}#c62828{% else %}#f57f17{% endif %};">
+                            class="status-tag {% if leave.status == 'APPROVED' %}approved{% elif leave.status == 'REJECTED' %}rejected{% else %}pending{% endif %}">
                             {{ leave.status }}
                         </span>
                     </td>
@@ -501,6 +178,7 @@
 
     </div>
 
+    <script src="/static/js/instructor_dashboard.js"></script>
 </body>
 
 </html>
