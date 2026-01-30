@@ -60,3 +60,14 @@ class Booking(Base):
     lab = relationship("Lab")
     instructor = relationship("Instructor", foreign_keys=[booked_by_id])
     module = relationship("Module")
+
+class Leave(Base):
+    __tablename__ = "leaves"
+    id = Column(Integer, primary_key=True, index=True)
+    instructor_id = Column(Integer, ForeignKey("instructors.id"))
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    reason = Column(String(255), nullable=True)
+    status = Column(String(20), default="PENDING")  # PENDING, APPROVED, REJECTED
+    
+    instructor = relationship("Instructor")

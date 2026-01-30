@@ -1,0 +1,626 @@
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Header */
+.header {
+    background: #004d40;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.logout {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.logout:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+}
+
+.container {
+    padding: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Tabs */
+.tab-container {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+    background: #eee;
+}
+
+.tab.active {
+    color: #004d40;
+    border-bottom: 2px solid #004d40;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Success Message */
+.success-msg {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #c8e6c9;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Profile Card */
+.profile-card {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e0f2f1;
+}
+
+.profile-info h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.6rem;
+    color: #004d40;
+}
+
+.profile-info .dept-role {
+    color: #555;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.profile-info .details {
+    color: #777;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.actions-bar {
+    margin-left: auto;
+    align-self: center;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #004d40;
+    color: white;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-export:hover {
+    background-color: #00695c;
+}
+
+.btn-pwd {
+    background-color: #0277bd;
+}
+
+.btn-leave {
+    background-color: #ef6c00;
+}
+
+/* Schedule List */
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+.schedule-header h3 {
+    margin: 0;
+    color: #444;
+}
+
+.session-card {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    border-left: 5px solid #ccc;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.session-card:hover {
+    transform: translateX(5px);
+}
+
+/* Past Session Styling */
+.session-card.past-session {
+    opacity: 0.6;
+    filter: grayscale(1);
+    border-left-color: #ccc !important;
+    background-color: #fafafa;
+}
+
+/* Status Colors */
+.session-card.status-class {
+    border-left-color: #004d40;
+    /* Teal */
+}
+
+.session-card.status-exam {
+    border-left-color: #c62828;
+    /* Red */
+}
+
+.session-card.status-adhoc {
+    border-left-color: #f9a825;
+    /* Yellow */
+}
+
+.date-box {
+    background: #f9f9f9;
+    padding: 15px;
+    min-width: 70px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid #eee;
+}
+
+.date-box .month {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #666;
+    font-weight: bold;
+}
+
+.date-box .day {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.date-box .weekday {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.details-box {
+    padding: 15px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.details-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.module-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.time-badge {
+    background: #eee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    white-space: nowrap;
+}
+
+.details-bottom {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.practical-name {
+    color: #00695c;
+    font-weight: 500;
+}
+
+.lab-location {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+    font-size: 0.9rem;
+}
+
+.tag {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.tag-class {
+    background: #e0f2f1;
+    color: #00695c;
+}
+
+.tag-exam {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Leave Status Tags */
+.status-tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-tag.approved {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.status-tag.rejected {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+.status-tag.pending {
+    background-color: #fff9c4;
+    color: #f57f17;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background: white;
+    border-radius: 8px;
+    color: #888;
+    border: 2px dashed #ddd;
+}
+
+.empty-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    display: block;
+    opacity: 0.5;
+}
+
+/* Tables */
+.leaves-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    color: #666;
+    font-size: 0.9em;
+    padding: 10px;
+}
+
+td {
+    border-bottom: 1px solid #f5f5f5;
+    padding: 10px;
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.modal-content.large {
+    width: 400px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* CALENDAR GRID STYLES */
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-nav h2 {
+    margin: 0;
+    color: #004d40;
+}
+
+.calendar-nav a {
+    text-decoration: none;
+    background: #eee;
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #333;
+    font-weight: bold;
+}
+
+.calendar-nav a:hover {
+    background: #ddd;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-header-cell {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    padding: 10px;
+    background: #e0f2f1;
+    border-radius: 4px;
+}
+
+.calendar-day {
+    background: white;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.calendar-day.today {
+    border: 2px solid #004d40;
+    background-color: #fffde7;
+}
+
+.day-number {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+.booking-badge {
+    display: block;
+    font-size: 0.75em;
+    padding: 4px;
+    margin-bottom: 4px;
+    border-radius: 3px;
+    background: #e0f7fa;
+    color: #006064;
+    text-decoration: none;
+    border-left: 3px solid #0097a7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.booking-badge:hover {
+    opacity: 0.8;
+}
+
+.booking-badge.status-leave {
+    background: #fff3e0;
+    color: #ef6c00;
+    border-left-color: #ff9800;
+}
+
+/* TOOLTIP STYLES */
+.booking-item {
+    position: relative;
+}
+
+.booking-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #263238;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    width: 220px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.85em;
+    text-align: left;
+    pointer-events: none;
+}
+
+.booking-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #263238 transparent transparent transparent;
+}
+
+.booking-item:hover .booking-tooltip {
+    display: block;
+    animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.booking-conflict {
+    background: #ffebee !important;
+    color: #c62828 !important;
+    border-left: 3px solid #d32f2f !important;
+}
+
+.warning-conflict {
+    background: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border: 1px solid #ffcdd2;
+}
+
+@media (max-width: 700px) {
+    .profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .actions-bar {
+        margin-left: 0;
+    }
+
+    .calendar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-day {
+        min-height: auto;
+    }
+}

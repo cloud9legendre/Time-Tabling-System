@@ -9,7 +9,7 @@ from slowapi import _rate_limit_exceeded_handler
 from ..database import engine, Base
 from ..auth.csrf import generate_csrf_token, CSRF_COOKIE_NAME
 from ..core.limiter import limiter
-from .routers import auth, dashboard, resources, bookings
+from .routers import auth, dashboard, resources, bookings, leaves
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
@@ -18,8 +18,17 @@ logger = logging.getLogger(__name__)
 # Create Tables (will be redundant with Alembic later, but kept for now)
 Base.metadata.create_all(bind=engine)
 
+from fastapi.staticfiles import StaticFiles
+import os
+
 app = FastAPI(title="CLTS")
 app.state.limiter = limiter
+
+# Mount Static Files
+static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if not os.path.exists(static_dir):
+    os.makedirs(static_dir)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Middleware & Exception Handlers
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -66,3 +75,4 @@ app.include_router(auth.router)
 app.include_router(dashboard.router)
 app.include_router(resources.router)
 app.include_router(bookings.router)
+app.include_router(leaves.router)

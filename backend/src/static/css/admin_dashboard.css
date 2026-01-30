@@ -1,0 +1,583 @@
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+    background: #f4f4f9;
+}
+
+/* Header & Logout */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #333;
+    margin: 0;
+}
+
+.btn-logout {
+    background: #d32f2f;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.btn-change-pwd {
+    background-color: #0277bd;
+    border: none;
+    cursor: pointer;
+}
+
+/* Tabs */
+.tab-container {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+    background: #eee;
+}
+
+.tab.active {
+    color: #004d40;
+    border-bottom: 2px solid #004d40;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Modern Form Styling */
+form.create-form {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+}
+
+/* Recurring Section Styling - Enhanced */
+.recurring-section {
+    background: linear-gradient(135deg, #e0f2f1 0%, #ffffff 100%);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #b2dfdb;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    min-height: 70px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.checkbox-wrapper input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #004d40;
+    margin: 0;
+}
+
+.checkbox-wrapper label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 700;
+    color: #004d40;
+    font-size: 1rem;
+}
+
+/* The hidden field container */
+#recurring_end_div {
+    background-color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #b2dfdb;
+    flex-grow: 1;
+    max-width: 250px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    animation: slideFadeIn 0.3s ease-out;
+    display: none;
+}
+
+#recurring_end_div label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #00695c;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#recurring_end_div input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    border-left: 4px solid #004d40;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+@keyframes slideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+button.btn-primary {
+    width: 100%;
+    background: #004d40;
+    color: white;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+button.btn-primary:hover {
+    background: #00695c;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background: #004d40;
+    color: white;
+}
+
+.error {
+    color: #d32f2f;
+    background: #ffcdd2;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.success {
+    color: #388e3c;
+    background: #c8e6c9;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+/* Leave Status Tags */
+.status-tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-tag.approved {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.status-tag.rejected {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+.status-tag.pending {
+    background-color: #fff9c4;
+    color: #f57f17;
+}
+
+.status-inactive {
+    color: #999;
+    text-decoration: line-through;
+}
+
+.btn-toggle {
+    font-size: 11px;
+    padding: 2px 6px;
+    background: #eee;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-edit {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
+.btn-delete {
+    color: #d32f2f;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0;
+    text-decoration: underline;
+    font-size: 0.9em;
+}
+
+.action-cell {
+    display: flex;
+    align-items: center;
+}
+
+/* Instructor Tiles Styling */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.instructor-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.instructor-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.instructor-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #004d40;
+    background-color: #f0f0f0;
+}
+
+.instructor-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.instructor-meta {
+    font-size: 0.85em;
+    color: #00695c;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.instructor-details {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.status-inactive.instructor-card {
+    opacity: 0.7;
+    background: #f9f9f9;
+}
+
+.status-inactive .instructor-img {
+    filter: grayscale(100%);
+    border-color: #ccc;
+}
+
+/* CALENDAR GRID STYLES */
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-nav h2 {
+    margin: 0;
+    color: #004d40;
+}
+
+.calendar-nav a {
+    text-decoration: none;
+    background: #eee;
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #333;
+    font-weight: bold;
+}
+
+.calendar-nav a:hover {
+    background: #ddd;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-header-cell {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    padding: 10px;
+    background: #e0f2f1;
+    border-radius: 4px;
+}
+
+.calendar-day {
+    background: white;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.calendar-day.today {
+    border: 2px solid #004d40;
+    background-color: #fffde7;
+}
+
+.day-number {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+.booking-badge {
+    display: block;
+    font-size: 0.75em;
+    padding: 4px;
+    margin-bottom: 4px;
+    border-radius: 3px;
+    background: #e0f7fa;
+    color: #006064;
+    text-decoration: none;
+    border-left: 3px solid #0097a7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.booking-badge:hover {
+    opacity: 0.8;
+}
+
+.booking-badge.status-leave {
+    background: #fff3e0;
+    color: #ef6c00;
+    border-left-color: #ff9800;
+}
+
+/* TOOLTIP STYLES */
+.booking-item {
+    position: relative;
+}
+
+.booking-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #263238;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    width: 220px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.85em;
+    text-align: left;
+    pointer-events: none;
+}
+
+.booking-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #263238 transparent transparent transparent;
+}
+
+.booking-item:hover .booking-tooltip {
+    display: block;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.booking-conflict {
+    background: #ffebee !important;
+    color: #c62828 !important;
+    border-left: 3px solid #d32f2f !important;
+}
+
+.warning-conflict {
+    background: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border: 1px solid #ffcdd2;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 25px;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 8px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
