@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/bookings/create")
 def create_booking(
+    request: Request,
     lab_id: int = Form(...), 
     instructor_id: int = Form(...), 
     module_code: str = Form(...),
@@ -85,7 +86,13 @@ def create_booking(
             db.add(new_booking)
             
         db.commit()
-        return RedirectResponse(url=f"/?success=Created {len(target_dates)} sessions successfully", status_code=303)
+        db.commit()
+        
+        referer = request.headers.get("referer", "/")
+        if "?" in referer:
+            referer = referer.split("?")[0]
+            
+        return RedirectResponse(url=f"{referer}?success=Created {len(target_dates)} sessions successfully", status_code=303)
 
     except ValueError:
         return RedirectResponse(url="/?error=Invalid Date/Time Format", status_code=303)
@@ -94,18 +101,26 @@ def create_booking(
         return RedirectResponse(url=f"/?error=System Error: {str(e)}", status_code=303)
 
 @router.post("/bookings/delete/{booking_id}")
-def delete_booking(booking_id: str, user: Instructor = Depends(get_current_active_admin), db: Session = Depends(get_db), csrf_protect: None = Depends(validate_csrf)):
+def delete_booking(booking_id: str, request: Request, user: Instructor = Depends(get_current_active_admin), db: Session = Depends(get_db), csrf_protect: None = Depends(validate_csrf)):
     # Auth Check handled by dependency
 
     try:
         booking = db.query(Booking).filter(Booking.id == booking_id).first()
+        
+        referer = request.headers.get("referer", "/")
+        if "?" in referer:
+            referer = referer.split("?")[0]
+
         if booking:
             db.delete(booking)
             db.commit()
-            return RedirectResponse(url="/?success=Booking Deleted", status_code=303)
-        return RedirectResponse(url="/?error=Booking Not Found", status_code=303)
+            return RedirectResponse(url=f"{referer}?success=Booking Deleted", status_code=303)
+        return RedirectResponse(url=f"{referer}?error=Booking Not Found", status_code=303)
     except Exception as e:
-        return RedirectResponse(url=f"/?error=Delete Failed: {str(e)}", status_code=303)
+        referer = request.headers.get("referer", "/")
+        if "?" in referer:
+             referer = referer.split("?")[0]
+        return RedirectResponse(url=f"{referer}?error=Delete Failed: {str(e)}", status_code=303)
 
 @router.get("/bookings/edit/{booking_id}", response_class=HTMLResponse)
 def edit_booking_page(request: Request, booking_id: str, user: Optional[Instructor] = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -126,6 +141,7 @@ def edit_booking_page(request: Request, booking_id: str, user: Optional[Instruct
 @router.post("/bookings/update/{booking_id}")
 def update_booking(
     booking_id: str,
+    request: Request,
     lab_id: int = Form(...), 
     instructor_id: int = Form(...), 
     module_code: str = Form(...),
@@ -153,10 +169,20 @@ def update_booking(
         booking.end_time = datetime.strptime(end_time[:5], "%H:%M").time()
         
         db.commit()
-        return RedirectResponse(url="/?success=Booking Updated", status_code=303)
+        db.commit()
+        
+        referer = request.headers.get("referer", "/")
+        if "?" in referer:
+            referer = referer.split("?")[0]
+            
+        return RedirectResponse(url=f"{referer}?success=Booking Updated", status_code=303)
 
     except ValueError as ve:
-        return RedirectResponse(url=f"/?error=Invalid Date/Time Format: {str(ve)}", status_code=303)
+        referer = request.headers.get("referer", "/")
+        if "?" in referer: referer = referer.split("?")[0]
+        return RedirectResponse(url=f"{referer}?error=Invalid Date/Time Format: {str(ve)}", status_code=303)
     except Exception as e:
         logger.error(f"Update Error: {e}")
-        return RedirectResponse(url=f"/?error=Update Failed: {str(e)}", status_code=303)
+        referer = request.headers.get("referer", "/")
+        if "?" in referer: referer = referer.split("?")[0]
+        return RedirectResponse(url=f"{referer}?error=Update Failed: {str(e)}", status_code=303)

@@ -18,24 +18,35 @@ router = APIRouter(
 def request_leave(
     request: Request,
     start_date: str = Form(...),
-    end_date: str = Form(...),
+    end_date: Optional[str] = Form(None),
     reason: str = Form(None),
+    target_instructor_id: Optional[int] = Form(None),
     user: Instructor = Depends(get_current_user),
     db: Session = Depends(get_db),
     csrf: None = Depends(validate_csrf)
 ):
     # Parse dates
     s_date = date.fromisoformat(start_date)
-    e_date = date.fromisoformat(end_date)
+    e_date = s_date
+    if end_date:
+        e_date = date.fromisoformat(end_date)
     
     if s_date > e_date:
-        raise HTTPException(status_code=400, detail="Start date must be before end date")
+        # If user accidentally picked end date before start, or single day logic failed
+        raise HTTPException(status_code=400, detail="Start date must be before or equal to end date")
         
-    # Auto-approve for Admins
-    status = "APPROVED" if user.role in ["ADMIN", "SUPER_ADMIN"] else "PENDING"
+    # Determine target instructor
+    instructor_id = user.id
+    status = "PENDING"
     
+    if user.role in ["ADMIN", "SUPER_ADMIN"]:
+        status = "APPROVED"
+        if target_instructor_id:
+            instructor_id = target_instructor_id
+            
+    # Create Leave
     new_leave = Leave(
-        instructor_id=user.id,
+        instructor_id=instructor_id,
         start_date=s_date,
         end_date=e_date,
         reason=reason,
@@ -44,14 +55,13 @@ def request_leave(
     db.add(new_leave)
     db.commit()
     
-    # Redirect back to where the request came from (instructor or admin dashboard)
-    # Ideally passing a success message param
-    referer = request.headers.get("referer")
-    if referer:
-        if "?" in referer:
-            referer = referer.split("?")[0]
-        return RedirectResponse(url=f"{referer}?success=Leave+Requested", status_code=303)
-    return RedirectResponse(url="/dashboard/instructor?success=Leave+Requested", status_code=303)
+    # Redirect back
+    referer = request.headers.get("referer", "/instructor")
+    if "?" in referer:
+        referer = referer.split("?")[0]
+        
+    msg = "Leave+Requested" if status == "PENDING" else "Leave+Placed+Successfully"
+    return RedirectResponse(url=f"{referer}?success={msg}", status_code=303)
 
 @router.post("/{leave_id}/approve")
 def approve_leave(

@@ -186,3 +186,18 @@ async function loadCalendar(year, month) {
         container.style.opacity = '1';
     }
 }
+
+function toggleAdminLeaveEnd() {
+    const chk = document.getElementById("admin_leave_multi_day");
+    const endDiv = document.getElementById("admin_leave_end_div");
+    const endInp = document.getElementById("admin_leave_end_date");
+
+    if (chk && chk.checked) {
+        endDiv.style.display = "block";
+        endInp.required = true;
+    } else {
+        endDiv.style.display = "none";
+        endInp.required = false;
+        if (endInp) endInp.value = "";
+    }
+}

@@ -48,6 +48,12 @@ def login():
         
         if response.status_code == 200 and "Admin Dashboard" in response.text:
             print_pass("Admin Login successful")
+            
+            if "Change Password" in response.text:
+                print_pass("Super Admin 'Change Password' button visible")
+            else:
+                print_warning("Change Password button missing")
+                
             return session
         else:
             print_fail("Admin Login failed", f"Status: {response.status_code}, URL: {response.url}")
@@ -66,6 +72,10 @@ def verify_modules(session):
         print_pass("Loaded Resources Tab")
         if "Manage Modules" in response.text:
             print_pass("Modules section visible")
+            if "<th>Dept</th>" in response.text:
+                print_pass("Modules table has 'Dept' column")
+            else:
+                print_fail("'Dept' column missing in Modules table")
         else:
             print_fail("Modules section not found in dashboard")
     else:
@@ -80,6 +90,35 @@ def verify_labs(session):
     else:
          print_fail("Labs section missing")
 
+def verify_leaves(session):
+    """Verifies leaves tab and new admin form."""
+    print("\n--- Verifying Leaves ---")
+    response = session.get(f"{BASE_URL}/", verify=False)
+    if "Place Leave (Admin Override)" in response.text:
+         print_pass("Admin Leave form visible")
+    else:
+         print_fail("Admin Leave form missing")
+    if "Multi-day" in response.text:
+         print_pass("Multi-day toggle visible")
+    else:
+         print_fail("Multi-day toggle missing")
+
+    # Verify AJAX/Toast linkage
+    if "ajax_handler.js" in response.text and "toast.js" in response.text:
+         print_pass("AJAX & Toast scripts linked")
+    else:
+         print_fail("AJAX/Toast scripts missing")
+
+    if 'class="container"' in response.text or "class='container'" in response.text:
+         print_pass("Main Container present for AJAX")
+    else:
+         print_fail("Main Container missing (AJAX will reload)")
+         
+    if 'name="repeat_until"' in response.text:
+         print_pass("Recurring Field 'repeat_until' corrected")
+    else:
+         print_fail("Recurring Field mismatch (still repeat_until_date?)")
+
 def run_smoke_tests():
     print("Starting Smoke Tests for Lab Timetabling System...")
     
@@ -89,6 +128,7 @@ def run_smoke_tests():
         
     verify_modules(session)
     verify_labs(session)
+    verify_leaves(session)
     
     print("\nVerification Complete.")
 

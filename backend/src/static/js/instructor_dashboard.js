@@ -41,3 +41,18 @@ async function loadCalendar(year, month) {
         container.style.opacity = '1';
     }
 }
+
+function toggleInstLeaveEnd() {
+    const chk = document.getElementById("inst_leave_multi_day");
+    const endDiv = document.getElementById("inst_leave_end_div");
+    const endInp = document.getElementById("inst_leave_end_date");
+
+    if (chk && chk.checked) {
+        endDiv.style.display = "block";
+        endInp.required = true;
+    } else {
+        endDiv.style.display = "none";
+        endInp.required = false;
+        if (endInp) endInp.value = "";
+    }
+}
