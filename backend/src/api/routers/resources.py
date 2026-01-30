@@ -84,9 +84,28 @@ def edit_module_page(request: Request, code: str, user: Optional[Instructor] = D
     })
 
 @router.post("/modules/update/{code}")
-def update_module(code: str, title: str = Form(...), dept: str = Form(...), semester: int = Form(...), db: Session = Depends(get_db), user: Instructor = Depends(get_current_active_admin), csrf_protect: None = Depends(validate_csrf)):
+def update_module(code: str, new_code: str = Form(None), title: str = Form(...), dept: str = Form(...), semester: int = Form(...), db: Session = Depends(get_db), user: Instructor = Depends(get_current_active_admin), csrf_protect: None = Depends(validate_csrf)):
     m = db.query(Module).get(code)
-    if m: m.title = title; m.offering_dept = dept; m.semester = semester; db.commit()
+    if not m:
+         return RedirectResponse(url="/?error=Module not found", status_code=303)
+         
+    if new_code and new_code != code:
+        # Check if new code exists
+        if db.query(Module).get(new_code):
+            return RedirectResponse(url=f"/?error=Module Code {new_code} already exists", status_code=303)
+        # Update PK
+        m.code = new_code
+        
+    m.title = title
+    m.offering_dept = dept
+    m.semester = semester
+    
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        return RedirectResponse(url=f"/?error=Cannot update code (Bookings exist?): {str(e)}", status_code=303)
+        
     return RedirectResponse(url="/?success=Module Updated", status_code=303)
 
 

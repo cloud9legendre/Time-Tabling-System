@@ -44,6 +44,8 @@ def login(request: Request, email: str = Form(...), password: str = Form(...), d
                 key="access_token", 
                 value=access_token, 
                 httponly=True, 
+                secure=True,
+                samesite="Lax",
                 max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
                 path="/"
             )

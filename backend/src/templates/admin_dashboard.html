@@ -12,7 +12,10 @@
 
 <body>
     <div class="header">
-        <h1>Admin Dashboard</h1>
+        <div style="display:flex; flex-direction:column;">
+            <h1>Admin Dashboard</h1>
+            <span style="font-size:14px; opacity:0.9; font-weight:normal;">Welcome, {{ user.name }}</span>
+        </div>
         <div style="margin-left:auto; display:flex; gap:10px;">
             {% if user.role == 'SUPER_ADMIN' %}
             <button onclick="openModal('pwd-modal')" class="btn-logout" style="background:#ff9800;">Change
@@ -213,7 +216,8 @@
                         <label>Reason</label>
                         <input type="text" name="reason" placeholder="Medical, Personal, etc." required>
                     </div>
-                    <button type="submit" class="btn-primary" style="width: auto;">Place Leave</button>
+                    <button type="submit" class="btn-primary" style="width: auto; margin-top: 20px;">Place
+                        Leave</button>
                 </form>
             </div>
 
@@ -545,7 +549,7 @@
                         <label>Location</label>
                         <input type="text" id="edit_lab_location" name="location" class="form-control">
                     </div>
-                    <button type="submit" class="btn-primary" style="width:100%;">Update Lab</button>
+                    <button type="submit" class="btn-primary" style="width:100%; margin-top: 20px;">Update Lab</button>
                 </form>
             </div>
         </div>
@@ -557,6 +561,10 @@
                 <span onclick="closeModal('edit-module-modal')" class="modal-close">✕</span>
                 <form id="edit-module-form" action="" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="form-group">
+                        <label>Code</label>
+                        <input type="text" id="edit_mod_code" name="new_code" required class="form-control">
+                    </div>
                     <div class="form-group">
                         <label>Name</label>
                         <input type="text" id="edit_mod_title" name="title" required class="form-control">
@@ -584,7 +592,8 @@
                             <option value="8">Sem 8</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-primary" style="width:100%;">Update Module</button>
+                    <button type="submit" class="btn-primary" style="width:100%; margin-top: 20px;">Update
+                        Module</button>
                 </form>
             </div>
         </div>
@@ -639,7 +648,7 @@
                         <input type="text" id="edit_bk_practical" name="practical_name" class="form-control">
                     </div>
 
-                    <button type="submit" class="btn-primary" style="width:100%;">Save Changes</button>
+                    <button type="submit" class="btn-primary" style="width:100%; margin-top:20px;">Save Changes</button>
                 </form>
             </div>
         </div>

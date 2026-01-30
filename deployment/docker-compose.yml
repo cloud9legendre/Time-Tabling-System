@@ -3,13 +3,13 @@ services:
   db:
     image: postgres:14-alpine
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: securepassword123
-      POSTGRES_DB: lab_timetabling_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d lab_timetabling_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       retries: 5
 
@@ -22,10 +22,12 @@ services:
     expose:
       - "8000"
     environment:
-      # DATABASE_URL is now read from .env if present, but we can override or pass through
-      DATABASE_URL: postgresql://admin:securepassword123@db:5432/lab_timetabling_db
+      # DATABASE_URL constructed from env vars
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
     env_file:
-      - ../backend/.env
+      - .env
     volumes:
       - ../backend:/app
 

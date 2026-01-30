@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback_unsafe_key_for_dev")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("No SECRET_KEY set for Flask application")
 ALGORITHM = "HS256"
 # Parse expire minutes, default to 30 if missing/invalid
 try:

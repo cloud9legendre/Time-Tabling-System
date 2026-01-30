@@ -88,6 +88,7 @@ function openEditModuleModal(btn) {
     const dept = btn.getAttribute('data-dept');
 
     document.getElementById('edit_mod_title').value = title;
+    document.getElementById('edit_mod_code').value = code;
 
     const semSelect = document.getElementById('edit_mod_sem');
     if (semSelect) semSelect.value = semester;

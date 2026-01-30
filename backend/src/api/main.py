@@ -45,7 +45,7 @@ async def add_csrf_cookie(request: Request, call_next):
     response = await call_next(request)
     
     if new_token:
-        response.set_cookie(key=CSRF_COOKIE_NAME, value=csrf_token, httponly=True, path="/")
+        response.set_cookie(key=CSRF_COOKIE_NAME, value=csrf_token, httponly=True, secure=True, samesite="Lax", path="/")
     return response
 
 @app.exception_handler(HTTPException)
