@@ -47,8 +47,41 @@ body {
 
 .container {
     padding: 20px;
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
+}
+
+/* Tabs */
+.tab-container {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+    background: #eee;
+}
+
+.tab.active {
+    color: #004d40;
+    border-bottom: 2px solid #004d40;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
 }
 
 /* Success Message */
@@ -289,7 +322,6 @@ body {
     color: #c62828;
 }
 
-
 /* Leave Status Tags */
 .status-tag {
     padding: 4px 8px;
@@ -407,6 +439,173 @@ td {
     box-sizing: border-box;
 }
 
+/* CALENDAR GRID STYLES */
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-nav h2 {
+    margin: 0;
+    color: #004d40;
+}
+
+.calendar-nav a {
+    text-decoration: none;
+    background: #eee;
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #333;
+    font-weight: bold;
+}
+
+.calendar-nav a:hover {
+    background: #ddd;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-header-cell {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    padding: 10px;
+    background: #e0f2f1;
+    border-radius: 4px;
+}
+
+.calendar-day {
+    background: white;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.calendar-day.today {
+    border: 2px solid #004d40;
+    background-color: #fffde7;
+}
+
+.day-number {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+.booking-badge {
+    display: block;
+    font-size: 0.75em;
+    padding: 4px;
+    margin-bottom: 4px;
+    border-radius: 3px;
+    background: #e0f7fa;
+    color: #006064;
+    text-decoration: none;
+    border-left: 3px solid #0097a7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.booking-badge:hover {
+    opacity: 0.8;
+}
+
+.booking-badge.status-leave {
+    background: #fff3e0;
+    color: #ef6c00;
+    border-left-color: #ff9800;
+}
+
+/* TOOLTIP STYLES */
+.booking-item {
+    position: relative;
+}
+
+.booking-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #263238;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    width: 220px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.85em;
+    text-align: left;
+    pointer-events: none;
+}
+
+.booking-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #263238 transparent transparent transparent;
+}
+
+.booking-item:hover .booking-tooltip {
+    display: block;
+    animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.booking-conflict {
+    background: #ffebee !important;
+    color: #c62828 !important;
+    border-left: 3px solid #d32f2f !important;
+}
+
+.warning-conflict {
+    background: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border: 1px solid #ffcdd2;
+}
+
 @media (max-width: 700px) {
     .profile-card {
         flex-direction: column;
@@ -415,5 +614,13 @@ td {
 
     .actions-bar {
         margin-left: 0;
+    }
+
+    .calendar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-day {
+        min-height: auto;
     }
 }

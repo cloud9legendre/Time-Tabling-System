@@ -1,0 +1,94 @@
+{% if unavailable_instructors_count > 0 %}
+<div class="warning-conflict">
+    ⚠️ <strong>Warning:</strong> {{ unavailable_instructors_count }} Instructor(s) are unavailable (on leave)
+    during scheduled classes in this view.
+</div>
+{% endif %}
+
+<div class="calendar-nav">
+    <a href="javascript:void(0)" onclick="loadCalendar({{ prev_year }}, {{ prev_month }})">◀ Prev</a>
+    <h2>{{ month_name }} {{ year }}</h2>
+    <a href="javascript:void(0)" onclick="loadCalendar({{ next_year }}, {{ next_month }})">Next ▶</a>
+</div>
+<div class="calendar-grid">
+    <!-- Headers -->
+    <div class="calendar-header-cell">Mon</div>
+    <div class="calendar-header-cell">Tue</div>
+    <div class="calendar-header-cell">Wed</div>
+    <div class="calendar-header-cell">Thu</div>
+    <div class="calendar-header-cell">Fri</div>
+    <div class="calendar-header-cell">Sat</div>
+    <div class="calendar-header-cell">Sun</div>
+
+    <!-- Days -->
+    {% for week in calendar_weeks %}
+    {% for day in week %}
+    {% if day == 0 %}
+    <div class="calendar-day empty"></div>
+    {% else %}
+    {% set date_str = year ~ '-' ~ ("%02d"|format(month)) ~ '-' ~ ("%02d"|format(day)) %}
+    <div class="calendar-day {{ 'today' if date_str == today_str else '' }}">
+        <div class="day-number">
+            {{ day }}
+            {% if (date_str in bookings_by_date) or (date_str in leaves_by_date) %}
+            <span style="font-size:0.7em; background:#004d40; color:white; padding:2px 5px; border-radius:10px;">
+                {{ (bookings_by_date[date_str]|length if date_str in bookings_by_date else 0) +
+                (leaves_by_date[date_str]|length if date_str in leaves_by_date else 0) }}
+            </span>
+            {% endif %}
+        </div>
+
+        <!-- Bookings -->
+        {% if date_str in bookings_by_date %}
+        {% for b in bookings_by_date[date_str] %}
+        <div class="booking-item">
+            <span class="booking-badge {{ 'booking-conflict' if b.is_conflict else '' }}">
+                {{ b.start_time.strftime('%H:%M') }} {{ b.module_code }}
+            </span>
+            <!-- Tooltip -->
+            <div class="booking-tooltip">
+                <div style="font-weight:bold; color:#80cbc4; margin-bottom:4px;">
+                    {{ b.module_code }} <span style="font-weight:normal; color:#b2dfdb; font-size:0.9em;">- {{
+                        b.practical_name }}</span>
+                </div>
+                <div>📅 {{ b.start_time.strftime('%H:%M') }} - {{ b.end_time.strftime('%H:%M') }}</div>
+                <div>👨‍🏫 {{ b.instructor.name }}</div>
+                <div style="margin-top:4px; font-style:italic; font-size:0.9em; color:#ddd;">{{ b.purpose }}</div>
+                {% if b.lab %}
+                <div style="margin-top:2px;">📍 {{ b.lab.name }}</div>
+                {% endif %}
+                {% if b.is_conflict %}
+                <div
+                    style="color:#d32f2f; font-weight:bold; margin-top:4px; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;">
+                    ⚠️ INSTRUCTOR ON LEAVE
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Leaves -->
+        {% if date_str in leaves_by_date %}
+        {% for l in leaves_by_date[date_str] %}
+        <div class="booking-item">
+            <span class="booking-badge status-leave">
+                🏖️ {{ l.instructor.name }}
+            </span>
+            <div class="booking-tooltip">
+                <div style="font-weight:bold; color:#ffcc80; margin-bottom:4px;">
+                    On Leave
+                </div>
+                <div>👨‍🏫 {{ l.instructor.name }}</div>
+                <div>📅 {{ l.start_date }} to {{ l.end_date }}</div>
+                <div style="margin-top:4px; font-style:italic; font-size:0.9em; color:#ddd;">{{ l.reason }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+</div>

@@ -181,6 +181,7 @@ form.create-form {
         opacity: 0;
         transform: translateX(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -214,7 +215,8 @@ table {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
+th,
+td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -239,6 +241,29 @@ th {
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 15px;
+}
+
+/* Leave Status Tags */
+.status-tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-tag.approved {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.status-tag.rejected {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+.status-tag.pending {
+    background-color: #fff9c4;
+    color: #f57f17;
 }
 
 .status-inactive {
@@ -452,6 +477,12 @@ th {
     opacity: 0.8;
 }
 
+.booking-badge.status-leave {
+    background: #fff3e0;
+    color: #ef6c00;
+    border-left-color: #ff9800;
+}
+
 /* TOOLTIP STYLES */
 .booking-item {
     position: relative;
@@ -496,6 +527,7 @@ th {
         opacity: 0;
         transform: translate(-50%, 5px);
     }
+
     to {
         opacity: 1;
         transform: translate(-50%, 0);
@@ -509,12 +541,12 @@ th {
 }
 
 .warning-conflict {
-    background:#ffebee; 
-    color:#c62828; 
-    padding:10px; 
-    border-radius:4px; 
-    margin-bottom:15px; 
-    border:1px solid #ffcdd2;
+    background: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border: 1px solid #ffcdd2;
 }
 
 /* Modal Styles */
@@ -531,11 +563,15 @@ th {
 
 .modal-content {
     background: white;
-    margin: 10% auto;
-    padding: 20px;
-    width: 300px;
+    margin: 5% auto;
+    padding: 25px;
+    width: 500px;
+    max-width: 90%;
     border-radius: 8px;
     position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .modal-close {

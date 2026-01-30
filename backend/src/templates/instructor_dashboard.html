@@ -13,7 +13,7 @@
     <div class="header">
         <div class="header-left">
             <span style="font-size: 24px;">🏛️</span>
-            <h1>Faculty of Engineering</h1>
+            <h1>Faculty of Engineering - {{ user.name }}</h1>
         </div>
         <a href="/logout" class="logout">Sign Out</a>
     </div>
@@ -30,29 +30,117 @@
         </div>
         {% endif %}
 
-        <!-- PROFILE CARD -->
-        <div class="profile-card">
-            <img src="{{ user.photo_url if user.photo_url else 'https://ui-avatars.com/api/?name=' + user.name + '&background=004d40&color=fff' }}"
-                class="profile-img" alt="Profile">
-            <div class="profile-info">
-                <h2>{{ user.name }}</h2>
-                <div class="dept-role">{{ user.department_code }} | {{ user.role }}</div>
-                <div class="details">
-                    {{ user.email }}
-                    {% if user.university %} • {{ user.university }}{% endif %}
-                    {% if user.degree %} • {{ user.degree }}{% endif %}
+        <div class="tab-container">
+            <div id="btn-dashboard" class="tab active" onclick="openTab('dashboard')">🏠 My Dashboard</div>
+            <div id="btn-calendar" class="tab" onclick="openTab('calendar')">🗓️ Master Schedule</div>
+        </div>
+
+        <!-- MY DASHBOARD TAB -->
+        <div id="dashboard" class="tab-content active">
+            <!-- PROFILE CARD -->
+            <div class="profile-card">
+                <img src="{{ user.photo_url if user.photo_url else 'https://ui-avatars.com/api/?name=' + user.name + '&background=004d40&color=fff' }}"
+                    class="profile-img" alt="Profile">
+                <div class="profile-info">
+                    <h2>{{ user.name }}</h2>
+                    <div class="dept-role">{{ user.department_code }} | {{ user.role }}</div>
+                    <div class="details">
+                        {{ user.email }}
+                        {% if user.university %} • {{ user.university }}{% endif %}
+                        {% if user.degree %} • {{ user.degree }}{% endif %}
+                    </div>
+                </div>
+                <div class="actions-bar">
+                    <button onclick="openModal('pwd-modal')" class="btn-export btn-pwd">
+                        🔒 Change Password
+                    </button>
+                    <button onclick="openModal('leave-modal')" class="btn-export btn-leave">
+                        🏖️ Request Leave
+                    </button>
+                    <a href="/export/ics" class="btn-export">
+                        📅 Sync Own Schedule
+                    </a>
                 </div>
             </div>
-            <div class="actions-bar">
-                <button onclick="openModal('pwd-modal')" class="btn-export btn-pwd">
-                    🔒 Change Password
-                </button>
-                <button onclick="openModal('leave-modal')" class="btn-export btn-leave">
-                    🏖️ Request Leave
-                </button>
-                <a href="/export/ics" class="btn-export">
-                    📅 Sync 🗓️ Master Schedule
-                </a>
+
+            <div class="schedule-header">
+                <h3>My Sessions</h3>
+            </div>
+
+            {% if schedule %}
+            {% for session in schedule %}
+            <div
+                class="session-card status-{{ session.purpose|lower }} {% if session.booking_date < today %}past-session{% endif %}">
+                <div class="date-box">
+                    <span class="month">{{ session.booking_date.strftime('%b') }}</span>
+                    <span class="day">{{ session.booking_date.strftime('%d') }}</span>
+                    <span class="weekday">{{ session.booking_date.strftime('%a') }}</span>
+                </div>
+                <div class="details-box">
+                    <div class="details-top">
+                        <span class="module-title">
+                            {{ session.module_code }}
+                            <span class="tag tag-{{ session.purpose|lower }}">{{ session.purpose }}</span>
+                        </span>
+                        <span class="time-badge">
+                            🕒 {{ session.start_time.strftime('%H:%M') }} - {{ session.end_time.strftime('%H:%M') }}
+                        </span>
+                    </div>
+                    <div class="details-bottom">
+                        {% if session.practical_name %}
+                        <div class="practical-name">{{ session.practical_name }}</div>
+                        {% endif %}
+                        <div class="lab-location">
+                            📍 {{ session.lab.name }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-icon">☕</span>
+                <h3>No upcoming sessions</h3>
+                <p>Your schedule is clear for now.</p>
+            </div>
+            {% endif %}
+
+            <!-- My Leaves Section -->
+            <div class="schedule-header" style="margin-top: 30px;">
+                <h3>My Leave Requests</h3>
+            </div>
+            {% if my_leaves %}
+            <div class="leaves-container">
+                <table>
+                    <tr>
+                        <th>Period</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                    {% for leave in my_leaves %}
+                    <tr>
+                        <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                        <td>{{ leave.reason if leave.reason else '-' }}</td>
+                        <td>
+                            <span
+                                class="status-tag {% if leave.status == 'APPROVED' %}approved{% elif leave.status == 'REJECTED' %}rejected{% else %}pending{% endif %}">
+                                {{ leave.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% else %}
+            <p style="color:#888; text-align:center; padding:20px;">No leave history.</p>
+            {% endif %}
+        </div>
+
+        <!-- CALENDAR TAB -->
+        <div id="calendar" class="tab-content">
+            <!-- AJAX Container -->
+            <div id="calendar-container">
+                {% include 'partials/calendar_grid.html' %}
             </div>
         </div>
 
@@ -103,78 +191,6 @@
                 </form>
             </div>
         </div>
-
-        <div class="schedule-header">
-            <h3>My Sessions</h3>
-        </div>
-
-        {% if schedule %}
-        {% for session in schedule %}
-        <div
-            class="session-card status-{{ session.purpose|lower }} {% if session.booking_date < today %}past-session{% endif %}">
-            <div class="date-box">
-                <span class="month">{{ session.booking_date.strftime('%b') }}</span>
-                <span class="day">{{ session.booking_date.strftime('%d') }}</span>
-                <span class="weekday">{{ session.booking_date.strftime('%a') }}</span>
-            </div>
-            <div class="details-box">
-                <div class="details-top">
-                    <span class="module-title">
-                        {{ session.module_code }}
-                        <span class="tag tag-{{ session.purpose|lower }}">{{ session.purpose }}</span>
-                    </span>
-                    <span class="time-badge">
-                        🕒 {{ session.start_time.strftime('%H:%M') }} - {{ session.end_time.strftime('%H:%M') }}
-                    </span>
-                </div>
-                <div class="details-bottom">
-                    {% if session.practical_name %}
-                    <div class="practical-name">{{ session.practical_name }}</div>
-                    {% endif %}
-                    <div class="lab-location">
-                        📍 {{ session.lab.name }}
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <span class="empty-icon">☕</span>
-            <h3>No upcoming sessions</h3>
-            <p>Your schedule is clear for now.</p>
-        </div>
-        {% endif %}
-
-        <!-- My Leaves Section -->
-        <div class="schedule-header" style="margin-top: 30px;">
-            <h3>My Leave Requests</h3>
-        </div>
-        {% if my_leaves %}
-        <div class="leaves-container">
-            <table>
-                <tr>
-                    <th>Period</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                </tr>
-                {% for leave in my_leaves %}
-                <tr>
-                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
-                    <td>{{ leave.reason if leave.reason else '-' }}</td>
-                    <td>
-                        <span
-                            class="status-tag {% if leave.status == 'APPROVED' %}approved{% elif leave.status == 'REJECTED' %}rejected{% else %}pending{% endif %}">
-                            {{ leave.status }}
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% else %}
-        <p style="color:#888; text-align:center; padding:20px;">No leave history.</p>
-        {% endif %}
 
     </div>
 

@@ -1,179 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Lab Timetable</title>
     <link rel="stylesheet" href="/static/css/admin_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
     <div class="header">
-        <h1>🏛️ Admin Dashboard - Welcome, {{ user.name }}</h1>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <button onclick="document.getElementById('pwd-modal').style.display='block'"
-                class="btn-logout btn-change-pwd">🔒 Change Pwd</button>
-            <a href="/logout" class="btn-logout">Sign Out</a>
-        </div>
+        <h1>Admin Dashboard</h1>
+        <a href="/logout" class="btn-logout">Logout</a>
     </div>
 
-    {% if request.query_params.error %}
-    <p class="error">{{ request.query_params.error }}</p>
-    {% endif %}
+    <!-- TABS -->
+    <div class="tab-container">
+        <div id="btn-calendar" class="tab active" onclick="openTab('calendar')">Master Schedule</div>
+        <div id="btn-manage" class="tab" onclick="openTab('manage')">Manage Bookings</div>
+        <div id="btn-leaves" class="tab" onclick="openTab('leaves')">Leaves {% if pending_count > 0 %}<span
+                style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px;">{{
+                pending_count }}</span>{% endif %}</div>
+        <div id="btn-instructors" class="tab" onclick="openTab('instructors')">Instructors</div>
+        <div id="btn-resources" class="tab" onclick="openTab('resources')">Resources</div>
+    </div>
 
     {% if request.query_params.success %}
-    <p class="success">{{ request.query_params.success }}</p>
+    <div class="success">✅ {{ request.query_params.success }}</div>
+    {% endif %}
+    {% if request.query_params.error %}
+    <div class="error">❌ {{ request.query_params.error }}</div>
     {% endif %}
 
-    <div class="tab-container">
-        <div id="btn-calendar" class="tab active" onclick="openTab('calendar')">🗓️ Master Schedule</div>
-        <div id="btn-bookings" class="tab" onclick="openTab('bookings')">📝 Manage Bookings</div>
-        <div id="btn-labs" class="tab" onclick="openTab('labs')">🔬 Labs</div>
-        <div id="btn-modules" class="tab" onclick="openTab('modules')">📚 Modules</div>
-        <div id="btn-instructors" class="tab" onclick="openTab('instructors')">👨‍🏫 Instructors</div>
-        <div id="btn-leaves" class="tab" onclick="openTab('leaves')">Leaves
-            {% if pending_count > 0 %}
-            <span style="background:#d32f2f; color:white; border-radius:50%; padding:2px 6px; font-size:0.8em;">{{
-                pending_count }}</span>
-            {% endif %}
-        </div>
-    </div>
 
-    <!-- CALENDAR TAB (Default) -->
+    <!-- CALENDAR TAB -->
     <div id="calendar" class="tab-content active">
-        {% if unavailable_instructors_count > 0 %}
-        <div class="warning-conflict">
-            ⚠️ <strong>Warning:</strong> {{ unavailable_instructors_count }} Instructor(s) are unavailable (on leave)
-            during scheduled classes in this view.
-        </div>
-        {% endif %}
-
-        <div class="calendar-nav">
-            <a href="/?month={{ prev_month }}&year={{ prev_year }}">◀ Prev</a>
-            <h2>{{ month_name }} {{ year }}</h2>
-            <a href="/?month={{ next_month }}&year={{ next_year }}">Next ▶</a>
-        </div>
-        <div class="calendar-grid">
-            <!-- Headers -->
-            <div class="calendar-header-cell">Mon</div>
-            <div class="calendar-header-cell">Tue</div>
-            <div class="calendar-header-cell">Wed</div>
-            <div class="calendar-header-cell">Thu</div>
-            <div class="calendar-header-cell">Fri</div>
-            <div class="calendar-header-cell">Sat</div>
-            <div class="calendar-header-cell">Sun</div>
-
-            <!-- Days -->
-            {% for week in calendar_weeks %}
-            {% for day in week %}
-            {% if day == 0 %}
-            <div class="calendar-day empty"></div>
-            {% else %}
-            {% set date_str = year ~ '-' ~ ("%02d"|format(month)) ~ '-' ~ ("%02d"|format(day)) %}
-            <div class="calendar-day {{ 'today' if date_str == today_str else '' }}">
-                <div class="day-number">
-                    {{ day }}
-                    {% if date_str in bookings_by_date %}
-                    <span
-                        style="font-size:0.7em; background:#004d40; color:white; padding:2px 5px; border-radius:10px;">
-                        {{ bookings_by_date[date_str]|length }}
-                    </span>
-                    {% endif %}
-                </div>
-
-                {% if date_str in bookings_by_date %}
-                {% for b in bookings_by_date[date_str] %}
-                <div class="booking-item">
-                    <a href="/bookings/edit/{{ b.id }}"
-                        class="booking-badge {{ 'booking-conflict' if b.is_conflict else '' }}">
-                        {{ b.start_time.strftime('%H:%M') }} {{ b.module_code }}
-                    </a>
-                    <!-- Tooltip -->
-                    <div class="booking-tooltip">
-                        <div style="font-weight:bold; color:#80cbc4; margin-bottom:4px;">
-                            {{ b.module_code }} <span style="font-weight:normal; color:#b2dfdb; font-size:0.9em;">- {{
-                                b.practical_name }}</span>
-                        </div>
-                        <div>📅 {{ b.start_time.strftime('%H:%M') }} - {{ b.end_time.strftime('%H:%M') }}</div>
-                        <div>👨‍🏫 {{ b.instructor.name }}</div>
-                        <div style="margin-top:4px; font-style:italic; font-size:0.9em; color:#ddd;">{{ b.purpose }}
-                        </div>
-                        {% if b.lab %}
-                        <div style="margin-top:2px;">📍 {{ b.lab.name }}</div>
-                        {% endif %}
-
-                        {% if b.is_conflict %}
-                        <div
-                            style="color:#d32f2f; font-weight:bold; margin-top:4px; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;">
-                            ⚠️ INSTRUCTOR ON LEAVE</div>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-                {% endif %}
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
+        <!-- AJAX Container -->
+        <div id="calendar-container">
+            {% include 'partials/calendar_grid.html' %}
         </div>
     </div>
 
-    <!-- BOOKINGS TAB -->
-    <div id="bookings" class="tab-content">
+    <!-- MANAGE BOOKINGS TAB -->
+    <div id="manage" class="tab-content">
         <form action="/bookings/create" method="POST" class="create-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-            <!-- Row 1: Who & Where -->
+            <h3>Create New Booking</h3>
+
             <div class="form-row">
                 <div class="form-group">
-                    <label>Lab Venue</label>
+                    <label>Module</label>
+                    <select name="module_id" required>
+                        <option value="">Select Module</option>
+                        {% for m in active_modules %}
+                        <option value="{{ m.code }}">{{ m.code }} - {{ m.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lab</label>
                     <select name="lab_id" required>
+                        <option value="">Select Lab</option>
                         {% for l in active_labs %}
-                        <option value="{{ l.id }}">{{ l.name }}</option>
+                        {% if l.is_active %}
+                        <option value="{{ l.id }}">{{ l.name }} (Cap: {{ l.capacity }})</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Instructor</label>
                     <select name="instructor_id" required>
+                        <option value="">Select Instructor</option>
                         {% for i in active_instructors %}
                         <option value="{{ i.id }}">{{ i.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Semester Filter</label>
-                    <select id="semester_select" onchange="filterModules()">
-                        <option value="all">-- All --</option>
-                        <option value="1">Sem 1</option>
-                        <option value="2">Sem 2</option>
-                        <option value="3">Sem 3</option>
-                        <option value="4">Sem 4</option>
-                        <option value="5">Sem 5</option>
-                        <option value="6">Sem 6</option>
-                        <option value="7">Sem 7</option>
-                        <option value="8">Sem 8</option>
-                    </select>
-                </div>
             </div>
 
-            <!-- Row 2: What -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Module</label>
-                    <select name="module_code" id="module_select" required>
-                        <option value="" disabled selected>-- Select --</option>
-                        {% for m in active_modules %}
-                        <option value="{{ m.code }}" data-sem="{{ m.semester }}">[{{ m.semester }}] {{ m.code }} - {{
-                            m.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group" style="flex: 2;">
-                    <label>Practical Name / Description</label>
-                    <input type="text" name="practical_name" placeholder="e.g. Lab 01: Introduction" required>
-                </div>
-            </div>
-
-            <!-- Row 3: When -->
             <div class="form-row">
                 <div class="form-group">
                     <label>Date</label>
@@ -189,29 +95,46 @@
                 </div>
             </div>
 
-            <!-- Row 4: Recurring (Separate Box) -->
-            <div class="recurring-section">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="is_recurring" name="is_recurring" onchange="toggleRecurring()">
-                    <label for="is_recurring">Repeat Weekly</label>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Purpose</label>
+                    <select name="purpose">
+                        <option value="CLASS">Class</option>
+                        <option value="EXAM">Exam</option>
+                        <option value="ADHOC">Ad-Hoc / Maintenance</option>
+                    </select>
                 </div>
-                <div id="recurring_end_div">
-                    <label>Repeat Until Date</label>
-                    <input type="date" name="repeat_until" id="repeat_until">
+                <div class="form-group">
+                    <label>Practical Name (Optional)</label>
+                    <input type="text" name="practical_name" placeholder="e.g. Lab 01">
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary">Confirm Booking</button>
+            <!-- Enhanced Recurring Checkbox -->
+            <div class="recurring-section">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="is_recurring" name="is_recurring" onchange="toggleRecurring()">
+                    <label for="is_recurring">Repeat Weekly?</label>
+                </div>
+
+                <div id="recurring_end_div">
+                    <label>Repeat Until:</label>
+                    <input type="date" id="repeat_until" name="repeat_until_date">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Create Booking</button>
         </form>
 
-        <h3>Current Schedule</h3>
+        <!-- BOOKING LIST -->
+        <h3>All Bookings</h3>
         <table>
             <thead>
                 <tr>
                     <th>Date</th>
                     <th>Time</th>
+                    <th>Module</th>
                     <th>Lab</th>
-                    <th>Mod</th>
                     <th>Instructor</th>
                     <th>Action</th>
                 </tr>
@@ -221,15 +144,22 @@
                 <tr>
                     <td>{{ b.booking_date }}</td>
                     <td>{{ b.start_time }} - {{ b.end_time }}</td>
-                    <td>{{ b.lab.name }}</td>
                     <td>{{ b.module_code }}</td>
+                    <td>{{ b.lab.name }}</td>
                     <td>{{ b.instructor.name }}</td>
-                    <td class="action-cell">
-                        <a href="/bookings/edit/{{ b.id }}" class="btn-edit">Edit</a>
-                        <form action="/bookings/delete/{{ b.id }}" method="POST" style="display:inline;"
-                            onsubmit="return confirm('Delete?');">
+                    <td>
+                        <button class="btn-edit" data-id="{{ b.id }}" data-date="{{ b.booking_date }}"
+                            data-start="{{ b.start_time }}" data-end="{{ b.end_time }}"
+                            data-module="{{ b.module_code }}" data-lab="{{ b.lab_id }}"
+                            data-instructor="{{ b.booked_by_id }}" data-practical="{{ b.practical_name }}"
+                            data-purpose="{{ b.purpose }}" onclick="openEditBookingModal(this)"
+                            style="background:none; border:none; color:#1976d2; cursor:pointer; font-weight:bold; margin-right:5px;">
+                            Edit
+                        </button>
+                        <form action="/bookings/delete/{{ b.id }}" method="POST"
+                            onsubmit="return confirm('Delete booking?');" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-delete">Del</button>
+                            <button class="btn-delete">Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -238,128 +168,75 @@
         </table>
     </div>
 
-    <!-- LABS TAB -->
-    <div id="labs" class="tab-content">
-        <form action="/labs/create" method="POST" class="create-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label>Dept</label>
-                    <select name="dept">
-                        {% for d in departments %}
-                        <option value="{{ d.code }}">{{ d.code }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Capacity</label>
-                    <input type="number" name="capacity" required>
-                </div>
-            </div>
-            <button type="submit" class="btn-primary">Add Lab</button>
-        </form>
-
+    <!-- LEAVES TAB -->
+    <div id="leaves" class="tab-content">
+        <h3>Pending Leave Requests</h3>
+        {% if pending_leaves %}
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Dept</th>
-                    <th>Status</th>
+                    <th>Instructor</th>
+                    <th>Period</th>
+                    <th>Reason</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for l in all_labs %}
-                <tr class="{{ 'status-inactive' if not l.is_active else '' }}">
-                    <td>{{ l.id }}</td>
-                    <td>{{ l.name }}</td>
-                    <td>{{ l.department_code }}</td>
-                    <td>{{ 'Active' if l.is_active else 'Inactive' }}</td>
+                {% for leave in pending_leaves %}
+                <tr>
+                    <td>{{ leave.instructor.name }}</td>
+                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                    <td>{{ leave.reason }}</td>
                     <td class="action-cell">
-                        <form action="/labs/toggle/{{ l.id }}" method="POST" style="display:inline;">
+                        <form action="/leaves/{{ leave.id }}/approve" method="POST" style="margin-right:10px;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-toggle">{{ 'Disable' if l.is_active else 'Enable' }}</button>
+                            <button class="btn-toggle"
+                                style="background:#c8e6c9; color:#2e7d32; border-color:#a5d6a7;">Approve</button>
                         </form>
-                        <a href="/labs/edit/{{ l.id }}" class="btn-edit">Edit</a>
-                        <form action="/labs/delete/{{ l.id }}" method="POST" style="display:inline;"
-                            onsubmit="return confirm('Delete?');">
+                        <form action="/leaves/{{ leave.id }}/reject" method="POST">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-delete">Del</button>
+                            <button class="btn-toggle"
+                                style="background:#ffcdd2; color:#c62828; border-color:#ef9a9a;">Reject</button>
                         </form>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
+        {% else %}
+        <p class="success">No pending leave requests.</p>
+        {% endif %}
 
-    <!-- MODULES TAB -->
-    <div id="modules" class="tab-content">
-        <form action="/modules/create" method="POST" class="create-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Code</label>
-                    <input type="text" name="code" required>
-                </div>
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" name="title" required>
-                </div>
-                <div class="form-group">
-                    <label>Dept</label>
-                    <select name="dept">
-                        {% for d in departments %}
-                        <option value="{{ d.code }}">{{ d.code }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Semester</label>
-                    <input type="number" name="semester" min="1" max="8" required>
-                </div>
-            </div>
-            <button type="submit" class="btn-primary">Add Module</button>
-        </form>
-
+        <h3 style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">Processed Leave History</h3>
+        {% if processed_leaves %}
         <table>
             <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Title</th>
-                    <th>Sem</th>
+                    <th>Instructor</th>
+                    <th>Period</th>
+                    <th>Reason</th>
                     <th>Status</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for m in all_modules %}
-                <tr class="{{ 'status-inactive' if not m.is_active else '' }}">
-                    <td>{{ m.code }}</td>
-                    <td>{{ m.title }}</td>
-                    <td>{{ m.semester }}</td>
-                    <td>{{ 'Active' if m.is_active else 'Inactive' }}</td>
-                    <td class="action-cell">
-                        <form action="/modules/toggle/{{ m.code }}" method="POST" style="display:inline;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-toggle">{{ 'Disable' if m.is_active else 'Enable' }}</button>
-                        </form>
-                        <a href="/modules/edit/{{ m.code }}" class="btn-edit">Edit</a>
-                        <form action="/modules/delete/{{ m.code }}" method="POST" style="display:inline;"
-                            onsubmit="return confirm('Delete?');">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-delete">Del</button>
-                        </form>
+                {% for leave in processed_leaves %}
+                <tr>
+                    <td>{{ leave.instructor.name }}</td>
+                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                    <td>{{ leave.reason }}</td>
+                    <td>
+                        <span
+                            class="status-tag {% if leave.status == 'APPROVED' %}approved{% elif leave.status == 'REJECTED' %}rejected{% else %}pending{% endif %}">
+                            {{ leave.status }}
+                        </span>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        <p style="color:#888; text-align:center;">No history available.</p>
+        {% endif %}
     </div>
 
     <!-- INSTRUCTORS TAB -->
@@ -423,7 +300,14 @@
                     </form>
                     {% endif %}
 
-                    <a href="/instructors/edit/{{ i.id }}" class="btn-edit">Edit</a>
+                    <button class="btn-edit" data-id="{{ i.id }}" data-name="{{ i.name }}" data-email="{{ i.email }}"
+                        data-dept="{{ i.department_code }}" data-role="{{ i.role }}"
+                        data-univ="{{ i.university or '' }}" data-degree="{{ i.degree or '' }}"
+                        data-grad="{{ i.graduated_date or '' }}" data-photo="{{ i.photo_url or '' }}"
+                        onclick="openEditInstructorModal(this)"
+                        style="background:none; border:none; color:#1976d2; cursor:pointer; font-weight:bold; margin-right:5px;">
+                        Edit
+                    </button>
                     <form action="/instructors/delete/{{ i.id }}" method="POST" style="display:inline;"
                         onsubmit="return confirm('Delete?');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -435,75 +319,331 @@
         </div>
     </div>
 
-    <!-- LEAVES TAB -->
-    <div id="leaves" class="tab-content">
-        <h3>Pending Leave Requests</h3>
-        {% if pending_leaves %}
+
+    <!-- RESOURCES TAB -->
+    <div id="resources" class="tab-content">
+        <h3>Manage Labs</h3>
+        <form action="/labs/create" method="POST" class="create-form" style="margin-bottom:30px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="form-row">
+                <div class="form-group"><label>Lab Name</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>Capacity</label><input type="number" name="capacity" required></div>
+                <div class="form-group">
+                    <label>Dept</label>
+                    <select name="dept">
+                        {% for d in departments %}
+                        <option value="{{ d.code }}">{{ d.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group"><label>Location</label><input type="text" name="location"></div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:auto;">Add Lab</button>
+        </form>
+
+        <div class="grid-container">
+            {% for l in all_labs %}
+            <div class="instructor-card {{ 'status-inactive' if not l.is_active else '' }}"
+                style="align-items:flex-start; text-align:left;">
+                <div class="instructor-name">{{ l.name }}</div>
+                <div class="instructor-meta">Capacity: {{ l.capacity }}</div>
+                <div class="instructor-details">
+                    {{ l.location if l.location else 'No location set' }}
+                </div>
+                <div class="card-actions" style="justify-content:flex-start;">
+                    <!-- Edit Button -->
+                    <button class="btn-edit" data-id="{{ l.id }}" data-name="{{ l.name }}"
+                        data-capacity="{{ l.capacity }}" data-location="{{ l.location or '' }}"
+                        data-dept="{{ l.department_code }}" onclick="openEditLabModal(this)"
+                        style="background:none; border:none; color:#1976d2; cursor:pointer; font-weight:bold; margin-right:5px;">
+                        Edit
+                    </button>
+
+                    <form action="/labs/toggle/{{ l.id }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="btn-toggle">{{ 'Disable' if l.is_active else 'Enable' }}</button>
+                    </form>
+                    <form action="/labs/delete/{{ l.id }}" method="POST" style="display:inline;"
+                        onsubmit="return confirm('Delete?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="btn-delete">Del</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h3 style="margin-top:40px;">Manage Modules</h3>
+        <form action="/modules/create" method="POST" class="create-form" style="margin-bottom:30px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="form-row">
+                <div class="form-group"><label>Code</label><input type="text" name="code" required></div>
+                <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+                <div class="form-group">
+                    <label>Dept</label>
+                    <select name="dept">
+                        {% for d in departments %}
+                        <option value="{{ d.code }}">{{ d.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select name="semester">
+                        <option value="1">Sem 1</option>
+                        <option value="2">Sem 2</option>
+                        <option value="3">Sem 3</option>
+                        <option value="4">Sem 4</option>
+                        <option value="5">Sem 5</option>
+                        <option value="6">Sem 6</option>
+                        <option value="7">Sem 7</option>
+                        <option value="8">Sem 8</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:auto;">Add Module</button>
+        </form>
+
         <table>
             <thead>
                 <tr>
-                    <th>Instructor</th>
-                    <th>Period</th>
-                    <th>Reason</th>
-                    <th>Actions</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Sem</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for leave in pending_leaves %}
-                <tr>
-                    <td>{{ leave.instructor.name }}</td>
-                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
-                    <td>{{ leave.reason }}</td>
+                {% for m in all_modules %}
+                <tr class="{{ 'status-inactive' if not m.is_active else '' }}">
+                    <td>{{ m.code }}</td>
+                    <td>{{ m.title }}</td>
+                    <td>{{ m.semester }}</td>
                     <td>
-                        <form action="/leaves/{{ leave.id }}/approve" method="POST" style="display:inline;">
+                        <!-- Edit Button -->
+                        <button class="btn-edit" data-code="{{ m.code }}" data-title="{{ m.title }}"
+                            data-sem="{{ m.semester }}" data-dept="{{ m.offering_dept }}"
+                            onclick="openEditModuleModal(this)"
+                            style="background:none; border:none; color:#1976d2; cursor:pointer; font-weight:bold; margin-right:5px;">
+                            Edit
+                        </button>
+
+                        <form action="/modules/toggle/{{ m.id }}" method="POST" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-toggle"
-                                style="background:#c8e6c9; color:#2e7d32; border-color:#a5d6a7;">Approve</button>
+                            <button class="btn-toggle">{{ 'Disable' if m.is_active else 'Enable' }}</button>
                         </form>
-                        <form action="/leaves/{{ leave.id }}/reject" method="POST" style="display:inline;"
-                            onsubmit="return confirm('Reject this leave?');">
+                        <form action="/modules/delete/{{ m.code }}" method="POST" style="display:inline;"
+                            onsubmit="return confirm('Delete?');">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button class="btn-toggle"
-                                style="background:#ffcdd2; color:#c62828; border-color:#ef9a9a;">Reject</button>
+                            <button class="btn-delete">Del</button>
                         </form>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-        <p class="success">No pending leave requests.</p>
-        {% endif %}
+
     </div>
 
     <!-- Password Change Modal -->
     <div id="pwd-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 style="margin-top:0;">Change Password</h3>
-            <span onclick="document.getElementById('pwd-modal').style.display='none'" class="modal-close">✕</span>
+            <span onclick="closeModal('pwd-modal')" class="modal-close">✕</span>
             <form action="/auth/change-password" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                <div style="margin-bottom:10px;">
-                    <label style="display:block; margin-bottom:5px; font-weight:600;">Current Password</label>
-                    <input type="password" name="old_password" required
-                        style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" name="old_password" required class="form-control">
                 </div>
-                <div style="margin-bottom:10px;">
-                    <label style="display:block; margin-bottom:5px; font-weight:600;">New Password</label>
-                    <input type="password" name="new_password" required
-                        style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" name="new_password" required class="form-control">
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="display:block; margin-bottom:5px; font-weight:600;">Confirm Password</label>
-                    <input type="password" name="confirm_password" required
-                        style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" required class="form-control">
                 </div>
-                <button type="submit"
-                    style="background:#004d40; color:white; padding:10px; border:none; width:100%; border-radius:4px; cursor:pointer; font-weight:bold;">Update
-                    Password</button>
+                <button type="submit" class="btn-primary" style="width:100%;">Update Password</button>
             </form>
         </div>
     </div>
+
+    <!-- EDIT LAB MODAL -->
+    <div id="edit-lab-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">Edit Lab</h3>
+            <span onclick="closeModal('edit-lab-modal')" class="modal-close">✕</span>
+            <form id="edit-lab-form" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="form-group">
+                    <label>Lab Name</label>
+                    <input type="text" id="edit_lab_name" name="name" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" id="edit_lab_capacity" name="capacity" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="edit_lab_dept" name="dept">
+                        {% for d in departments %}
+                        <option value="{{ d.code }}">{{ d.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="edit_lab_location" name="location" class="form-control">
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%;">Update Lab</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT MODULE MODAL -->
+    <div id="edit-module-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">Edit Module</h3>
+            <span onclick="closeModal('edit-module-modal')" class="modal-close">✕</span>
+            <form id="edit-module-form" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="edit_mod_title" name="title" required class="form-control">
+                </div>
+                <!-- Note: 'code' is primary key but we might want to allow editing, 
+                     usually primary keys are locked. Let's assume code is locked for now to keep it simple -->
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="edit_mod_dept" name="dept">
+                        {% for d in departments %}
+                        <option value="{{ d.code }}">{{ d.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select id="edit_mod_sem" name="semester">
+                        <option value="1">Sem 1</option>
+                        <option value="2">Sem 2</option>
+                        <option value="3">Sem 3</option>
+                        <option value="4">Sem 4</option>
+                        <option value="5">Sem 5</option>
+                        <option value="6">Sem 6</option>
+                        <option value="7">Sem 7</option>
+                        <option value="8">Sem 8</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%;">Update Module</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT BOOKING MODAL -->
+    <div id="edit-booking-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">Edit Booking</h3>
+            <span onclick="closeModal('edit-booking-modal')" class="modal-close">✕</span>
+            <form id="edit-booking-form" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="edit_bk_date" name="booking_date" required class="form-control">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start</label>
+                        <input type="time" id="edit_bk_start" name="start_time" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>End</label>
+                        <input type="time" id="edit_bk_end" name="end_time" required class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Module</label>
+                    <select id="edit_bk_module" name="module_code" required>
+                        {% for m in all_modules %}
+                        <option value="{{ m.code }}">{{ m.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lab</label>
+                    <select id="edit_bk_lab" name="lab_id" required>
+                        {% for l in all_labs %}
+                        <option value="{{ l.id }}">{{ l.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Instructor</label>
+                    <select id="edit_bk_instructor" name="instructor_id" required>
+                        {% for i in all_instructors %}
+                        <option value="{{ i.id }}">{{ i.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Practical (Opt)</label>
+                    <input type="text" id="edit_bk_practical" name="practical_name" class="form-control">
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%;">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT INSTRUCTOR MODAL -->
+    <div id="edit-instructor-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">Edit Instructor</h3>
+            <span onclick="closeModal('edit-instructor-modal')" class="modal-close">✕</span>
+            <form id="edit-instructor-form" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="form-row">
+                    <div class="form-group"><label>Name</label><input type="text" id="edit_inst_name" name="name"
+                            required class="form-control"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="edit_inst_email" name="email"
+                            required class="form-control"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Dept</label>
+                        <select id="edit_inst_dept" name="dept">
+                            {% for d in departments %}
+                            <option value="{{ d.code }}">{{ d.code }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="edit_inst_role" name="role">
+                            <option value="INSTRUCTOR">INSTRUCTOR</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Extended Details -->
+                <div class="form-row">
+                    <div class="form-group"><label>University</label><input type="text" id="edit_inst_univ"
+                            name="university" class="form-control"></div>
+                    <div class="form-group"><label>Degree</label><input type="text" id="edit_inst_degree" name="degree"
+                            class="form-control"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Graduated</label><input type="date" id="edit_inst_grad"
+                            name="graduated_date" class="form-control"></div>
+                    <div class="form-group"><label>Photo URL</label><input type="text" id="edit_inst_photo"
+                            name="photo_url" class="form-control"></div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%;">Update Instructor</button>
+            </form>
+        </div>
+    </div>
+
 
     <script src="/static/js/admin_dashboard.js"></script>
 </body>
