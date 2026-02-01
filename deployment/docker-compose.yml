@@ -22,8 +22,8 @@ services:
     expose:
       - "8000"
     environment:
-      # DATABASE_URL constructed from env vars
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      # DATABASE_URL from .env (Neon)
+      DATABASE_URL: ${DATABASE_URL}
       SECRET_KEY: ${SECRET_KEY}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
     env_file:
